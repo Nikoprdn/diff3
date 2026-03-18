@@ -8,389 +8,428 @@
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
 :root{
-  --red:#E4032E; --red-d:#a8001f; --red-s:rgba(228,3,46,.14); --red-b:rgba(228,3,46,.32);
-  --bg:#0b0a0f; --s1:#17151e; --s2:#201d28; --s3:#2a2735; --border:#38334a;
-  --pur:#37333E; --pur-l:#504a62;
+  --red:#E4032E; --red-d:#a8001f;
+  --red-s:rgba(228,3,46,.13); --red-b:rgba(228,3,46,.32);
+  --bg:#0b0a0f; --s1:#17151e; --s2:#201d28; --s3:#2a2735;
+  --border:#38334a; --pur:#37333E; --pur-l:#504a62;
   --txt:#ece8f4; --muted:#958fa6; --dim:#615b73;
   --green:#22c55e; --amber:#f59e0b; --blue:#38bdf8;
-  --head-h:64px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--txt);min-height:100vh;overflow-x:hidden}
+body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--txt);min-height:100vh}
 
 /* ─── HEADER ─── */
 header{
-  position:sticky;top:0;z-index:300;height:var(--head-h);
+  position:sticky;top:0;z-index:300;height:62px;
   background:linear-gradient(115deg,var(--s1) 0%,var(--pur) 100%);
   border-bottom:2px solid var(--red);
   box-shadow:0 2px 28px rgba(0,0,0,.6);
-  display:grid;grid-template-columns:220px 1fr 220px;align-items:center;padding:0 18px;gap:8px;
+  display:grid;grid-template-columns:auto 1fr auto;
+  align-items:center;padding:0 18px;gap:12px;
 }
-.h-logo svg{height:40px;width:auto}
-.h-title{text-align:center;font-family:'Rajdhani',sans-serif;font-size:1.6rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase}
+.h-logo{display:flex;align-items:center}
+.h-logo img{height:38px;width:auto;filter:brightness(0) invert(1)}
+.h-title{
+  text-align:center;font-family:'Rajdhani',sans-serif;
+  font-size:1.55rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;
+}
 .h-title em{color:var(--red);font-style:normal}
-.h-right{display:flex;align-items:center;justify-content:flex-end;gap:10px}
-#clock{font-family:'Rajdhani',sans-serif;font-size:1.45rem;font-weight:600;letter-spacing:.1em;color:var(--red);background:var(--red-s);border:1px solid var(--red-b);padding:4px 14px;border-radius:7px;min-width:108px;text-align:center}
+#clock{
+  font-family:'Rajdhani',sans-serif;font-size:1.4rem;font-weight:600;
+  letter-spacing:.1em;color:var(--red);
+  background:var(--red-s);border:1px solid var(--red-b);
+  padding:4px 14px;border-radius:7px;min-width:106px;text-align:center;
+}
 
-/* ─── LAYOUT ─── */
-main{padding:14px 14px 30px;display:flex;flex-direction:column;gap:14px}
+/* ─── MAIN ─── */
+main{padding:12px 12px 32px;display:flex;flex-direction:column;gap:12px}
 
-/* ─── CARD ─── */
-.card{background:var(--s1);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:0 3px 20px rgba(0,0,0,.4)}
-.card-head{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:linear-gradient(90deg,var(--s2),var(--s3));border-bottom:1px solid var(--border);gap:10px;min-height:44px}
-.card-head-l{display:flex;align-items:center;gap:9px;min-width:0}
-.card-ico{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
+/* ─── COLLAPSIBLE SECTION ─── */
+.section-wrap{background:var(--s1);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:0 3px 20px rgba(0,0,0,.4)}
+
+.section-toggle{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 16px;
+  background:linear-gradient(90deg,var(--s2),var(--s3));
+  border-bottom:1px solid var(--border);
+  cursor:pointer;user-select:none;gap:10px;
+  transition:background .15s;
+}
+.section-toggle:hover{background:linear-gradient(90deg,var(--s3),#32303f)}
+.section-toggle-l{display:flex;align-items:center;gap:10px;min-width:0}
+.section-ico{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
 .ico-r{background:var(--red-s);border:1px solid var(--red-b)}
 .ico-p{background:rgba(55,51,62,.5);border:1px solid var(--pur-l)}
 .ico-a{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3)}
-.card-title{font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.card-sub{font-size:.66rem;color:var(--muted);letter-spacing:.05em;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.card-acts{display:flex;gap:7px;align-items:center;flex-shrink:0}
+.section-title{font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.11em;text-transform:uppercase}
+.section-sub{font-size:.67rem;color:var(--muted);letter-spacing:.05em;margin-top:1px}
+.section-toggle-r{display:flex;align-items:center;gap:8px;flex-shrink:0}
 
-/* badge */
-.badge{font-family:'Rajdhani',sans-serif;font-size:.66rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;padding:2px 8px;border-radius:20px;display:flex;align-items:center;gap:4px;white-space:nowrap}
+.chevron{
+  width:20px;height:20px;display:flex;align-items:center;justify-content:center;
+  color:var(--muted);transition:transform .25s;flex-shrink:0;
+}
+.chevron svg{width:14px;height:14px}
+.section-wrap.collapsed .chevron{transform:rotate(-90deg)}
+
+.section-body{transition:max-height .3s ease,opacity .25s;overflow:hidden;max-height:2000px;opacity:1}
+.section-wrap.collapsed .section-body{max-height:0;opacity:0}
+
+/* ─── BADGES ─── */
+.badge{font-family:'Rajdhani',sans-serif;font-size:.63rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;padding:2px 8px;border-radius:20px;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
 .badge-live{background:var(--red-s);border:1px solid var(--red-b);color:var(--red)}
 .badge-live::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--red);box-shadow:0 0 5px var(--red);animation:blink 1.6s infinite}
 .badge-ok{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:var(--green)}
 .badge-warn{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);color:var(--amber)}
+.badge-count{background:var(--red-s);border:1px solid var(--red-b);color:var(--red)}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
 
-/* btn */
-.btn{font-family:'Rajdhani',sans-serif;font-size:.75rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:4px 11px;border-radius:5px;border:none;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:4px;transition:all .14s;white-space:nowrap}
-.btn-r{background:var(--red);color:#fff}.btn-r:hover{background:var(--red-d);color:#fff;transform:translateY(-1px)}
+/* ─── BUTTONS ─── */
+.btn{font-family:'Rajdhani',sans-serif;font-size:.74rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:4px 11px;border-radius:5px;border:none;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:4px;transition:all .14s;white-space:nowrap}
+.btn-r{background:var(--red);color:#fff}.btn-r:hover{background:var(--red-d);color:#fff}
 .btn-g{background:var(--s3);border:1px solid var(--border);color:var(--muted)}.btn-g:hover{background:var(--pur);color:var(--txt)}
+.btn-test{background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.35);color:var(--amber);font-size:.68rem;padding:3px 9px}
+.btn-test:hover{background:rgba(245,158,11,.25);color:var(--amber)}
 
-/* status bar */
-.sbar{display:flex;align-items:center;gap:8px;padding:6px 14px;background:var(--s2);border-top:1px solid var(--border);font-size:.66rem;color:var(--dim);letter-spacing:.06em;text-transform:uppercase}
+/* ─── STATUS BAR ─── */
+.sbar{display:flex;align-items:center;gap:8px;padding:6px 14px;background:var(--s2);border-top:1px solid var(--border);font-size:.64rem;color:var(--dim);letter-spacing:.06em;text-transform:uppercase}
 .dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 4px var(--green);animation:blink 2s infinite;flex-shrink:0}
-.dot-warn{background:var(--amber);box-shadow:0 0 4px var(--amber)}
+.dot-warn{background:var(--amber)!important;box-shadow:0 0 4px var(--amber)!important}
 .sep{color:var(--border)}
 
-/* loader */
+/* ─── SPINNER ─── */
 .ldr{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:var(--s2);z-index:10;transition:opacity .35s}
 .ldr.gone{opacity:0;pointer-events:none}
-.spin{width:28px;height:28px;border:2.5px solid var(--border);border-top-color:var(--red);border-radius:50%;animation:spin .8s linear infinite}
+.spin{width:26px;height:26px;border:2.5px solid var(--border);border-top-color:var(--red);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* ─── GARES GRID ─── */
+.gares-body{padding:10px}
 .gares-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.gare-card{background:var(--s1);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:0 2px 14px rgba(0,0,0,.35);display:flex;flex-direction:column}
-.gare-head{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;background:linear-gradient(90deg,var(--s2),var(--s3));border-bottom:1px solid var(--border);gap:6px}
-.gare-name{font-family:'Rajdhani',sans-serif;font-size:.95rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
-.gare-code{font-size:.6rem;color:var(--dim);background:var(--s3);border:1px solid var(--border);padding:1px 6px;border-radius:4px;letter-spacing:.08em}
-.gare-iframe-wrap{position:relative;flex:1}
-.gare-iframe-wrap iframe{width:100%;height:330px;border:none;display:block;background:#fff}
 
-/* iframe inversion filter for dark mode appearance */
+.gare-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;overflow:hidden;display:flex;flex-direction:column}
+.gare-head{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:var(--s2);border-bottom:1px solid var(--border);gap:6px}
+.gare-name{font-family:'Rajdhani',sans-serif;font-size:.9rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;line-height:1}
+.gare-code{font-size:.58rem;color:var(--dim);background:var(--s3);border:1px solid var(--border);padding:1px 5px;border-radius:3px;letter-spacing:.07em;font-family:'Rajdhani',sans-serif;font-weight:600}
+
+.gare-iframe-wrap{position:relative;flex:1}
 .gare-iframe-wrap iframe{
-  filter:invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.95);
+  width:100%;height:290px;border:none;display:block;
+  /* Invert colors for dark theme compatibility */
+  filter:invert(1) hue-rotate(180deg) brightness(.9) contrast(.95) saturate(.9);
+}
+/* tchoo has its own dark UI, don't invert */
+.gare-iframe-wrap.no-invert iframe{filter:none}
+
+.gare-sbar{display:flex;align-items:center;gap:6px;padding:5px 10px;background:var(--s2);border-top:1px solid var(--border);font-size:.6rem;color:var(--dim);letter-spacing:.05em;text-transform:uppercase}
+
+/* ─── INCIDENTS ─── */
+.inc-body-wrap{padding:10px;display:flex;flex-direction:column;gap:8px}
+
+.inc-feed{display:flex;flex-direction:column;gap:7px;max-height:360px;overflow-y:auto;padding-right:4px}
+.inc-feed::-webkit-scrollbar{width:3px}
+.inc-feed::-webkit-scrollbar-track{background:var(--s2)}
+.inc-feed::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+.inc-item{
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:8px;padding:9px 12px;
+  border-left:3px solid var(--amber);
+  transition:box-shadow .3s,border-color .3s;
+}
+.inc-item.ok{border-left-color:var(--green)}
+.inc-item.crit{border-left-color:var(--red)}
+.inc-item.info{border-left-color:var(--blue)}
+
+/* FLASH animation for new incidents */
+@keyframes flash-red{
+  0%,100%{background:var(--s2);box-shadow:none}
+  25%{background:rgba(228,3,46,.22);box-shadow:0 0 16px rgba(228,3,46,.45)}
+  75%{background:rgba(228,3,46,.1);box-shadow:0 0 8px rgba(228,3,46,.25)}
+}
+.inc-item.flashing{
+  animation:flash-red 1s ease-in-out 6; /* 6 cycles ≈ 1 min avec délai géré en JS */
+  border-left-color:var(--red)!important;
 }
 
-/* ─── BOTTOM ROW ─── */
-.bottom-row{display:grid;grid-template-columns:1fr 380px;gap:14px}
-
-/* ─── INCIDENT PANEL ─── */
-.incident-panel{background:var(--s1);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:0 3px 20px rgba(0,0,0,.4);display:flex;flex-direction:column}
-.incident-feed{padding:10px 12px;display:flex;flex-direction:column;gap:7px;overflow-y:auto;max-height:430px;flex:1}
-.incident-item{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;border-left:3px solid var(--amber)}
-.incident-item.info{border-left-color:var(--blue)}
-.incident-item.ok{border-left-color:var(--green)}
-.incident-item.crit{border-left-color:var(--red)}
-.inc-header{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px}
-.inc-tag{font-family:'Rajdhani',sans-serif;font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:1px 7px;border-radius:4px}
+.inc-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px}
+.inc-tag{font-family:'Rajdhani',sans-serif;font-size:.65rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;padding:1px 7px;border-radius:3px}
 .inc-tag.retard{background:rgba(245,158,11,.15);color:var(--amber)}
 .inc-tag.incident{background:rgba(228,3,46,.15);color:var(--red)}
 .inc-tag.ok{background:rgba(34,197,94,.12);color:var(--green)}
 .inc-tag.info{background:rgba(56,189,248,.12);color:var(--blue)}
-.inc-time{font-size:.62rem;color:var(--dim)}
-.inc-body{font-size:.75rem;color:var(--muted);line-height:1.5}
-.inc-body strong{color:var(--txt)}
-.inc-source{font-size:.62rem;color:var(--dim);margin-top:4px}
+.inc-time{font-size:.6rem;color:var(--dim)}
+.inc-text{font-size:.76rem;color:var(--muted);line-height:1.5}
+.inc-text strong{color:var(--txt)}
+.inc-src{font-size:.6rem;color:var(--dim);margin-top:3px}
 
-.inc-refresh-btn{
-  display:flex;align-items:center;gap:6px;
-  font-family:'Rajdhani',sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
-  cursor:pointer;background:none;border:none;color:var(--muted);padding:4px 8px;border-radius:5px;
-  transition:color .15s;
+/* X timeline wrapper */
+.x-wrap{border-top:1px solid var(--border)}
+.x-label{
+  display:flex;align-items:center;gap:7px;padding:6px 14px;
+  background:var(--s2);border-bottom:1px solid var(--border);
+  font-family:'Rajdhani',sans-serif;font-size:.7rem;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
 }
-.inc-refresh-btn:hover{color:var(--txt)}
+.x-label a{margin-left:auto;font-size:.62rem;color:var(--red-b);text-decoration:none}
 
-/* Scrollbar */
-.incident-feed::-webkit-scrollbar{width:4px}
-.incident-feed::-webkit-scrollbar-track{background:var(--s2)}
-.incident-feed::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+/* ─── WAZE ─── */
+.waze-body{position:relative;height:440px}
+.waze-body iframe{width:100%;height:100%;border:none;display:block}
 
-/* ─── WAZE COMPACT ─── */
-.waze-wrap{position:relative;height:430px}
-.waze-wrap iframe{width:100%;height:100%;border:none;display:block}
-
-/* ─── CARTO TCHOO ─── */
-.tchoo-wrap{position:relative}
-.tchoo-wrap iframe{width:100%;height:330px;border:none;display:block;background:#fff}
+/* ─── BOTTOM 2-col ─── */
+.bottom-row{display:grid;grid-template-columns:1fr 360px;gap:12px}
 
 /* ─── RESPONSIVE ─── */
 @media(max-width:1100px){.gares-grid{grid-template-columns:repeat(2,1fr)}.bottom-row{grid-template-columns:1fr}}
-@media(max-width:700px){.gares-grid{grid-template-columns:1fr}.h-title{font-size:1rem;letter-spacing:.1em}}
-
-/* X timeline */
-.x-embed-wrap{overflow-y:auto;max-height:400px;background:var(--s2)}
-.x-embed-wrap iframe{border:none!important}
+@media(max-width:700px){.gares-grid{grid-template-columns:1fr}.h-title{font-size:1rem}}
 </style>
 </head>
 <body>
 
-<!-- ═══ HEADER ═══ -->
+<!-- ══ HEADER ══ -->
 <header>
   <div class="h-logo">
-    <svg viewBox="0 0 230 62" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Radio Monaco">
-      <rect x="2" y="2" width="58" height="58" rx="13" stroke="white" stroke-width="4" fill="none"/>
-      <path d="M13 48 L13 20 L31 39 L49 20 L49 48" stroke="white" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-      <rect x="20" y="49" width="22" height="9" rx="4" fill="white"/>
-      <rect x="26" y="44" width="10" height="6" rx="2" fill="white"/>
-      <text x="70" y="28" font-family="'DM Sans',sans-serif" font-size="17" font-weight="300" fill="rgba(255,255,255,0.85)" letter-spacing="2">radio</text>
-      <text x="70" y="55" font-family="'DM Sans',sans-serif" font-size="27" font-weight="600" fill="white" letter-spacing="0.5">monaco</text>
-      <path d="M197 6 L201 17 L208 10 L215 17 L219 6" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-    </svg>
+    <!-- Logo Radio Monaco — version blanche via CSS filter -->
+    <img src="logo-radio-monaco.png" alt="Radio Monaco Monte-Carlo"
+         onerror="this.style.display='none'"/>
   </div>
-  <div class="h-title">TRAFFIC <em>TOOL</em></div>
-  <div class="h-right">
-    <div id="clock">00:00:00</div>
-  </div>
+  <div class="h-title">TRAFIC <em>TOOL</em></div>
+  <div id="clock">00:00:00</div>
 </header>
 
-<!-- ═══ MAIN ═══ -->
 <main>
 
-  <!-- ─── SECTION FERROVIAIRE (6 gares) ─── -->
-  <div class="card">
-    <div class="card-head">
-      <div class="card-head-l">
-        <div class="card-ico ico-r">🚂</div>
+  <!-- ══════════════════════════════════════════
+       SECTION 1 — FERROVIAIRE
+  ══════════════════════════════════════════ -->
+  <div class="section-wrap" id="sec-ferro">
+    <div class="section-toggle" onclick="toggleSection('sec-ferro')">
+      <div class="section-toggle-l">
+        <div class="section-ico ico-r">🚂</div>
         <div>
-          <div class="card-title">Ferroviaire — Départs temps réel</div>
-          <div class="card-sub">6 gares · Axe Cannes → Nice → Menton → Monaco</div>
+          <div class="section-title">Ferroviaire — Départs temps réel</div>
+          <div class="section-sub">6 gares · Côte d'Azur · 5 prochains trains · hors TGV</div>
         </div>
       </div>
-      <div class="card-acts">
+      <div class="section-toggle-r">
         <span class="badge badge-live">Live</span>
-        <a href="https://astucesweb.fr/projets/sncf/" target="_blank" class="btn btn-g">astucesweb.fr ↗</a>
+        <div class="chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
       </div>
     </div>
 
-    <div style="padding:12px">
-      <div class="gares-grid">
+    <div class="section-body">
+      <div class="gares-body">
+        <div class="gares-grid">
 
-        <!-- NICE NIC -->
-        <div class="gare-card">
-          <div class="gare-head">
-            <div>
-              <div class="gare-name">Nice-Ville</div>
+          <!-- Cannes — 43.55401,7.01873 -->
+          <div class="gare-card">
+            <div class="gare-head">
+              <div><div class="gare-name">Cannes</div></div>
+              <div style="display:flex;align-items:center;gap:5px">
+                <span class="gare-code">CAN</span>
+                <a href="https://carto.tchoo.net/43.55401,7.01873,15.09999,0,0/8775762" target="_blank" style="color:var(--red-b);font-size:.65rem;text-decoration:none">↗</a>
+              </div>
             </div>
-            <div style="display:flex;align-items:center;gap:5px">
-              <span class="gare-code">NIC</span>
-              <span class="badge badge-live" style="font-size:.58rem;padding:1px 6px">Live</span>
+            <div class="gare-iframe-wrap no-invert">
+              <div class="ldr" id="l0"><div class="spin"></div></div>
+              <iframe src="https://carto.tchoo.net/43.55401,7.01873,15.09999,0,0/8775762"
+                title="Cannes départs" loading="lazy" onload="gone('l0')"></iframe>
             </div>
+            <div class="gare-sbar"><div class="dot"></div><span>carto.tchoo.net · Cannes</span></div>
           </div>
-          <div class="gare-iframe-wrap">
-            <div class="ldr" id="l-nic"><div class="spin"></div></div>
-            <iframe src="https://astucesweb.fr/projets/sncf/departs/NIC/"
-              title="Départs Nice" loading="lazy"
-              onload="gone('l-nic')"></iframe>
-          </div>
-          <div class="sbar"><div class="dot"></div><span>Nice-Ville · NIC</span></div>
-        </div>
 
-        <!-- CANNES CAN -->
-        <div class="gare-card">
-          <div class="gare-head">
-            <div><div class="gare-name">Cannes</div></div>
-            <div style="display:flex;align-items:center;gap:5px">
-              <span class="gare-code">CAN</span>
-              <span class="badge badge-live" style="font-size:.58rem;padding:1px 6px">Live</span>
+          <!-- Nice Saint-Augustin — 43.70479,7.26174 -->
+          <div class="gare-card">
+            <div class="gare-head">
+              <div><div class="gare-name">Nice St-Augustin</div></div>
+              <div style="display:flex;align-items:center;gap:5px">
+                <span class="gare-code">NIC</span>
+                <a href="https://carto.tchoo.net/43.70479,7.26174,15.1,0,0/8775605" target="_blank" style="color:var(--red-b);font-size:.65rem;text-decoration:none">↗</a>
+              </div>
             </div>
-          </div>
-          <div class="gare-iframe-wrap">
-            <div class="ldr" id="l-can"><div class="spin"></div></div>
-            <iframe src="https://astucesweb.fr/projets/sncf/departs/CAN/"
-              title="Départs Cannes" loading="lazy"
-              onload="gone('l-can')"></iframe>
-          </div>
-          <div class="sbar"><div class="dot"></div><span>Cannes · CAN</span></div>
-        </div>
-
-        <!-- MENTON MEN -->
-        <div class="gare-card">
-          <div class="gare-head">
-            <div><div class="gare-name">Menton</div></div>
-            <div style="display:flex;align-items:center;gap:5px">
-              <span class="gare-code">MEN</span>
-              <span class="badge badge-live" style="font-size:.58rem;padding:1px 6px">Live</span>
+            <div class="gare-iframe-wrap no-invert">
+              <div class="ldr" id="l1"><div class="spin"></div></div>
+              <iframe src="https://carto.tchoo.net/43.70479,7.26174,15.1,0,0/8775605"
+                title="Nice St-Augustin départs" loading="lazy" onload="gone('l1')"></iframe>
             </div>
+            <div class="gare-sbar"><div class="dot"></div><span>carto.tchoo.net · Nice</span></div>
           </div>
-          <div class="gare-iframe-wrap">
-            <div class="ldr" id="l-men"><div class="spin"></div></div>
-            <iframe src="https://astucesweb.fr/projets/sncf/departs/MEN/"
-              title="Départs Menton" loading="lazy"
-              onload="gone('l-men')"></iframe>
-          </div>
-          <div class="sbar"><div class="dot"></div><span>Menton · MEN</span></div>
-        </div>
 
-        <!-- VILLENEUVE-LOUBET VFH -->
-        <div class="gare-card">
-          <div class="gare-head">
-            <div><div class="gare-name">Villeneuve-Loubet</div></div>
-            <div style="display:flex;align-items:center;gap:5px">
-              <span class="gare-code">VFH</span>
-              <span class="badge badge-live" style="font-size:.58rem;padding:1px 6px">Live</span>
+          <!-- Nice Ville — 43.70695,7.31416 -->
+          <div class="gare-card">
+            <div class="gare-head">
+              <div><div class="gare-name">Nice-Ville</div></div>
+              <div style="display:flex;align-items:center;gap:5px">
+                <span class="gare-code">NIC-V</span>
+                <a href="https://carto.tchoo.net/43.70695,7.31416,15.1,0,0/8775636" target="_blank" style="color:var(--red-b);font-size:.65rem;text-decoration:none">↗</a>
+              </div>
             </div>
-          </div>
-          <div class="gare-iframe-wrap">
-            <div class="ldr" id="l-vfh"><div class="spin"></div></div>
-            <iframe src="https://astucesweb.fr/projets/sncf/departs/VFH/"
-              title="Départs Villeneuve-Loubet" loading="lazy"
-              onload="gone('l-vfh')"></iframe>
-          </div>
-          <div class="sbar"><div class="dot"></div><span>Villeneuve-Loubet · VFH</span></div>
-        </div>
-
-        <!-- CAGNES-SUR-MER CQR -->
-        <div class="gare-card">
-          <div class="gare-head">
-            <div><div class="gare-name">Cagnes-sur-Mer</div></div>
-            <div style="display:flex;align-items:center;gap:5px">
-              <span class="gare-code">CQR</span>
-              <span class="badge badge-live" style="font-size:.58rem;padding:1px 6px">Live</span>
+            <div class="gare-iframe-wrap no-invert">
+              <div class="ldr" id="l2"><div class="spin"></div></div>
+              <iframe src="https://carto.tchoo.net/43.70695,7.31416,15.1,0,0/8775636"
+                title="Nice-Ville départs" loading="lazy" onload="gone('l2')"></iframe>
             </div>
+            <div class="gare-sbar"><div class="dot"></div><span>carto.tchoo.net · Nice-Ville</span></div>
           </div>
-          <div class="gare-iframe-wrap">
-            <div class="ldr" id="l-cqr"><div class="spin"></div></div>
-            <iframe src="https://astucesweb.fr/projets/sncf/departs/CQR/"
-              title="Départs Cagnes-sur-Mer" loading="lazy"
-              onload="gone('l-cqr')"></iframe>
-          </div>
-          <div class="sbar"><div class="dot"></div><span>Cagnes-sur-Mer · CQR</span></div>
-        </div>
 
-        <!-- CARTO TCHOO Monaco 87756403 -->
-        <div class="gare-card">
-          <div class="gare-head">
-            <div><div class="gare-name">Monaco MC</div></div>
-            <div style="display:flex;align-items:center;gap:5px">
-              <span class="gare-code">87756403</span>
-              <span class="badge badge-live" style="font-size:.58rem;padding:1px 6px">Live</span>
+          <!-- Antibes — 43.55537,7.02135 (pas d'ID UIC précis, URL sans ID) -->
+          <div class="gare-card">
+            <div class="gare-head">
+              <div><div class="gare-name">Antibes</div></div>
+              <div style="display:flex;align-items:center;gap:5px">
+                <span class="gare-code">ANT</span>
+                <a href="https://carto.tchoo.net/43.55537,7.02135,14.42379,0,0" target="_blank" style="color:var(--red-b);font-size:.65rem;text-decoration:none">↗</a>
+              </div>
             </div>
+            <div class="gare-iframe-wrap no-invert">
+              <div class="ldr" id="l3"><div class="spin"></div></div>
+              <iframe src="https://carto.tchoo.net/43.55537,7.02135,14.42379,0,0"
+                title="Antibes départs" loading="lazy" onload="gone('l3')"></iframe>
+            </div>
+            <div class="gare-sbar"><div class="dot"></div><span>carto.tchoo.net · Antibes</span></div>
           </div>
-          <div class="gare-iframe-wrap tchoo-wrap">
-            <div class="ldr" id="l-mc"><div class="spin"></div></div>
-            <iframe src="https://carto.tchoo.net/station/87756403"
-              title="Monaco Monte-Carlo SNCF" loading="lazy"
-              onload="gone('l-mc')"
-              style="filter:none"></iframe>
+
+          <!-- Villefranche / Beaulieu — 43.71221,7.33188 -->
+          <div class="gare-card">
+            <div class="gare-head">
+              <div><div class="gare-name">Villefranche / Beaulieu</div></div>
+              <div style="display:flex;align-items:center;gap:5px">
+                <span class="gare-code">VFR</span>
+                <a href="https://carto.tchoo.net/43.71221,7.33188,14.21286,0,0" target="_blank" style="color:var(--red-b);font-size:.65rem;text-decoration:none">↗</a>
+              </div>
+            </div>
+            <div class="gare-iframe-wrap no-invert">
+              <div class="ldr" id="l4"><div class="spin"></div></div>
+              <iframe src="https://carto.tchoo.net/43.71221,7.33188,14.21286,0,0"
+                title="Villefranche-Beaulieu départs" loading="lazy" onload="gone('l4')"></iframe>
+            </div>
+            <div class="gare-sbar"><div class="dot"></div><span>carto.tchoo.net · Villefranche/Beaulieu</span></div>
           </div>
-          <div class="sbar">
-            <div class="dot"></div>
-            <span>Monaco Monte-Carlo · carto.tchoo.net</span>
-            <span class="sep">·</span>
-            <a href="https://carto.tchoo.net/station/87756403" target="_blank" style="color:var(--red-b);text-decoration:none;font-size:.62rem;">↗</a>
+
+          <!-- Monaco — 43.73942,7.42136 -->
+          <div class="gare-card">
+            <div class="gare-head">
+              <div><div class="gare-name">Monaco MC 🎲</div></div>
+              <div style="display:flex;align-items:center;gap:5px">
+                <span class="gare-code">MCO</span>
+                <a href="https://carto.tchoo.net/43.73942,7.42136,14.98324,0,0" target="_blank" style="color:var(--red-b);font-size:.65rem;text-decoration:none">↗</a>
+              </div>
+            </div>
+            <div class="gare-iframe-wrap no-invert">
+              <div class="ldr" id="l5"><div class="spin"></div></div>
+              <iframe src="https://carto.tchoo.net/43.73942,7.42136,14.98324,0,0"
+                title="Monaco départs" loading="lazy" onload="gone('l5')"></iframe>
+            </div>
+            <div class="gare-sbar"><div class="dot"></div><span>carto.tchoo.net · Monaco</span></div>
           </div>
-        </div>
 
-      </div><!-- /gares-grid -->
-    </div>
-
-    <div class="sbar">
-      <div class="dot"></div>
-      <span>astucesweb.fr · API SNCF</span>
-      <span class="sep">·</span>
-      <span>6 gares surveillées · rafraîchissement automatique</span>
-    </div>
-  </div>
-
-  <!-- ─── BOTTOM ROW : INCIDENTS + WAZE ─── -->
-  <div class="bottom-row">
-
-    <!-- INCIDENTS -->
-    <div class="incident-panel">
-      <div class="card-head">
-        <div class="card-head-l">
-          <div class="card-ico ico-a">⚠️</div>
-          <div>
-            <div class="card-title">Incidents &amp; Perturbations</div>
-            <div class="card-sub">Axe Cannes → Nice → Menton · TER PACA · @TERPACA_SNCF</div>
-          </div>
-        </div>
-        <div class="card-acts">
-          <span class="badge badge-warn" id="inc-badge">Vérification…</span>
-          <button class="inc-refresh-btn" onclick="loadIncidents()">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
-            Actualiser
-          </button>
-          <a href="https://www.ter.sncf.com/sud-provence-alpes-cote-d-azur/se-deplacer/info-trafic" target="_blank" class="btn btn-g">TER PACA ↗</a>
-          <a href="https://x.com/TERPACA_SNCF" target="_blank" class="btn btn-g">@TERPACA ↗</a>
-        </div>
-      </div>
-
-      <!-- Feed incidents -->
-      <div class="incident-feed" id="inc-feed">
-        <div style="display:flex;align-items:center;justify-content:center;height:80px;color:var(--dim);font-size:.8rem">
-          <div class="spin" style="margin-right:10px"></div> Chargement des incidents…
-        </div>
-      </div>
-
-      <!-- X timeline embed TERPACA_SNCF -->
-      <div style="border-top:1px solid var(--border);">
-        <div style="padding:6px 14px;background:var(--s2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="color:var(--muted)"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.738l7.731-8.835L1.254 2.25H8.08l4.261 5.635 5.903-5.635zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-          <span style="font-family:'Rajdhani',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">@TERPACA_SNCF — Fil info trafic officiel</span>
-          <a href="https://x.com/TERPACA_SNCF" target="_blank" style="margin-left:auto;font-size:.65rem;color:var(--red-b);text-decoration:none">Voir sur X ↗</a>
-        </div>
-        <div class="x-embed-wrap">
-          <a class="twitter-timeline"
-             data-theme="dark"
-             data-chrome="noheader nofooter noborders transparent"
-             data-tweet-limit="5"
-             data-width="100%"
-             data-height="320"
-             href="https://twitter.com/TERPACA_SNCF">
-            Tweets de @TERPACA_SNCF
-          </a>
-        </div>
-      </div>
-
-      <div class="sbar">
-        <div class="dot" id="inc-dot"></div>
-        <span id="inc-status">Chargement…</span>
-        <span class="sep">·</span>
-        <span>Sources : SNCF Open Data · @TERPACA_SNCF · francebleu.fr</span>
-      </div>
-    </div>
-
-    <!-- WAZE -->
-    <div class="card">
-      <div class="card-head">
-        <div class="card-head-l">
-          <div class="card-ico ico-p">🗺️</div>
-          <div>
-            <div class="card-title">Waze — Monaco</div>
-            <div class="card-sub">Principauté · Temps réel</div>
-          </div>
-        </div>
-        <div class="card-acts">
-          <span class="badge badge-live">Live</span>
-          <a href="https://www.waze.com/fr/live-map/?zoom=13&lat=43.7384&lon=7.4246" target="_blank" class="btn btn-r">↗</a>
-        </div>
-      </div>
-      <div class="waze-wrap">
-        <div class="ldr" id="l-waze"><div class="spin"></div></div>
-        <iframe
-          src="https://embed.waze.com/iframe?zoom=13&lat=43.7384&lon=7.4246&ct=livemap&pin=0"
-          title="Waze Monaco" allowfullscreen loading="lazy"
-          onload="gone('l-waze')"></iframe>
+        </div><!-- /gares-grid -->
       </div>
       <div class="sbar">
         <div class="dot"></div>
-        <span>Monaco 43.7384°N 7.4246°E</span>
+        <span>Source : carto.tchoo.net · API SNCF</span>
+        <span class="sep">·</span>
+        <span>5 prochains départs · hors TGV</span>
+        <span class="sep">·</span>
+        <span>Rafraîchissement automatique</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       BOTTOM ROW : INCIDENTS + WAZE
+  ══════════════════════════════════════════ -->
+  <div class="bottom-row">
+
+    <!-- ─── INCIDENTS ─── -->
+    <div class="section-wrap" id="sec-inc">
+      <div class="section-toggle" onclick="toggleSection('sec-inc')">
+        <div class="section-toggle-l">
+          <div class="section-ico ico-a">⚠️</div>
+          <div>
+            <div class="section-title">Incidents &amp; Perturbations</div>
+            <div class="section-sub">Axe Cannes → Nice → Menton · TER PACA</div>
+          </div>
+        </div>
+        <div class="section-toggle-r">
+          <span class="badge badge-ok" id="inc-badge">Normal</span>
+          <button class="btn btn-test" onclick="testFlash(event)" title="Tester le clignotement d'une alerte">
+            🔴 Test alerte
+          </button>
+          <button class="btn btn-g" style="font-size:.68rem;padding:3px 9px" onclick="loadIncidents(event)" title="Actualiser les incidents">
+            ↺ Actu
+          </button>
+          <a href="https://www.ter.sncf.com/sud-provence-alpes-cote-d-azur/se-deplacer/info-trafic" target="_blank" class="btn btn-g">TER PACA ↗</a>
+          <a href="https://x.com/TERPACA_SNCF" target="_blank" class="btn btn-g">@TERPACA ↗</a>
+          <div class="chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </div>
+      </div>
+
+      <div class="section-body">
+        <div class="inc-body-wrap">
+          <!-- Feed incidents -->
+          <div class="inc-feed" id="inc-feed">
+            <div style="display:flex;align-items:center;gap:10px;padding:10px;color:var(--dim);font-size:.78rem">
+              <div class="spin"></div> Chargement…
+            </div>
+          </div>
+        </div>
+
+        <!-- X/Twitter Timeline -->
+        <div class="x-wrap">
+          <div class="x-label">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.738l7.731-8.835L1.254 2.25H8.08l4.261 5.635 5.903-5.635zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            @TERPACA_SNCF — Info trafic officiel
+            <a href="https://x.com/TERPACA_SNCF" target="_blank">Voir sur X ↗</a>
+          </div>
+          <div style="background:var(--s2);overflow:hidden">
+            <a class="twitter-timeline"
+               data-theme="dark"
+               data-chrome="noheader nofooter noborders transparent"
+               data-tweet-limit="4"
+               data-width="100%"
+               data-height="280"
+               href="https://twitter.com/TERPACA_SNCF">
+            </a>
+          </div>
+        </div>
+
+        <div class="sbar">
+          <div class="dot" id="inc-dot"></div>
+          <span id="inc-status">Vérification en cours…</span>
+          <span class="sep">·</span>
+          <span>Mise à jour toutes les 90 s</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── WAZE ─── -->
+    <div class="section-wrap" id="sec-waze">
+      <div class="section-toggle" onclick="toggleSection('sec-waze')">
+        <div class="section-toggle-l">
+          <div class="section-ico ico-p">🗺️</div>
+          <div>
+            <div class="section-title">Waze — Monaco</div>
+            <div class="section-sub">Principauté · Temps réel communautaire</div>
+          </div>
+        </div>
+        <div class="section-toggle-r">
+          <span class="badge badge-live">Live</span>
+          <a href="https://www.waze.com/fr/live-map/?zoom=13&lat=43.7384&lon=7.4246" target="_blank" class="btn btn-r" onclick="event.stopPropagation()">↗</a>
+          <div class="chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="waze-body">
+          <div class="ldr" id="l-waze"><div class="spin"></div></div>
+          <iframe src="https://embed.waze.com/iframe?zoom=13&lat=43.7384&lon=7.4246&ct=livemap&pin=0"
+            title="Waze Monaco" allowfullscreen loading="lazy" onload="gone('l-waze')"></iframe>
+        </div>
+        <div class="sbar">
+          <div class="dot"></div>
+          <span>embed.waze.com · Monaco 43.7384°N 7.4246°E</span>
+        </div>
       </div>
     </div>
 
@@ -398,7 +437,6 @@ main{padding:14px 14px 30px;display:flex;flex-direction:column;gap:14px}
 
 </main>
 
-<!-- Twitter widget script -->
 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
 <script>
@@ -417,137 +455,175 @@ function gone(id){
   el.classList.add('gone');
   setTimeout(()=>{try{el.remove()}catch(e){}},400);
 }
+setTimeout(()=>gone('l-waze'),10000);
 
-/* ─── INCIDENTS ENGINE ─── */
-/*
-  Stratégie : Navitia/SNCF open data n'est pas accessible sans clé CORS.
-  On utilise l'API publique SNCF Open Data via le proxy CORS corsproxy.io
-  (ou allorigins) pour récupérer les disruptions sur la ligne TER Cannes-Menton.
-  URL : https://api.sncf.com/v1/coverage/sncf/disruptions
-  Sans clé : on génère des items basés sur les retards détectés dans les iframes
-  ET on parse le flux RSS des perturbations TER PACA via allorigins.
-*/
-
-const RSS_URL = 'https://www.ter.sncf.com/sud-provence-alpes-cote-d-azur/se-deplacer/info-trafic';
-const PROXY   = 'https://api.allorigins.win/get?url=';
-
-// Gares surveillées pour la détection de retard dans les iframes
-const GARES_WATCH = [
-  {id:'nic',name:'Nice-Ville'},
-  {id:'can',name:'Cannes'},
-  {id:'men',name:'Menton'},
-  {id:'vfh',name:'Villeneuve-Loubet'},
-  {id:'cqr',name:'Cagnes-sur-Mer'},
-];
-
-let incidents = [];
-
-function nowStr(){
-  return new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+/* ─── COLLAPSIBLE ─── */
+function toggleSection(id){
+  document.getElementById(id).classList.toggle('collapsed');
 }
 
-function renderIncidents(){
-  const feed = document.getElementById('inc-feed');
-  const badge = document.getElementById('inc-badge');
-  const status = document.getElementById('inc-status');
-  const dot = document.getElementById('inc-dot');
+/* ─── INCIDENTS ─── */
+const PROXY='https://api.allorigins.win/get?url=';
+let knownIds = new Set();       // IDs déjà vus — pour détecter les nouveaux
+let flashTimers = {};           // timers de flash par ID
 
-  if(!incidents.length){
-    feed.innerHTML=`<div class="incident-item ok">
-      <div class="inc-header"><span class="inc-tag ok">✓ Normal</span><span class="inc-time">${nowStr()}</span></div>
-      <div class="inc-body"><strong>Trafic normal</strong> sur l'axe Cannes → Nice → Menton.<br>Aucune perturbation signalée.</div>
-      <div class="inc-source">Dernière vérification : ${nowStr()}</div>
-    </div>`;
+function nowStr(){return new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}
+
+function flashItem(el, durationMs){
+  el.classList.add('flashing');
+  const tid = setTimeout(()=>el.classList.remove('flashing'), durationMs);
+  return tid;
+}
+
+/* Lance le flash 1 min sur un item */
+function startFlash(itemEl){
+  // CSS animation flash-red dure 1s × 6 cycles = 6s
+  // On la relance toutes les 6s pendant 1 min (10 fois)
+  itemEl.classList.add('flashing');
+  let count=0;
+  const interval=setInterval(()=>{
+    count++;
+    if(count>=10){
+      clearInterval(interval);
+      itemEl.classList.remove('flashing');
+      return;
+    }
+    // force reflow to restart animation
+    itemEl.classList.remove('flashing');
+    void itemEl.offsetWidth;
+    itemEl.classList.add('flashing');
+  },6000);
+}
+
+/* Bouton TEST */
+function testFlash(e){
+  e.stopPropagation();
+  const feed=document.getElementById('inc-feed');
+  const testItem = document.createElement('div');
+  testItem.className='inc-item crit';
+  testItem.innerHTML=`
+    <div class="inc-row">
+      <span class="inc-tag incident">⚡ TEST — Incident simulé</span>
+      <span class="inc-time">${nowStr()}</span>
+    </div>
+    <div class="inc-text"><strong>ALERTE TEST</strong> — Ceci est un test du système de clignotement.<br>La case clignote en rouge pendant <strong>1 minute</strong>.</div>
+    <div class="inc-src">Bouton de test manuel · ${nowStr()}</div>
+  `;
+  feed.prepend(testItem);
+  startFlash(testItem);
+
+  // Badge warn
+  const badge=document.getElementById('inc-badge');
+  badge.className='badge badge-warn';
+  badge.textContent='TEST alerte';
+  document.getElementById('inc-dot').classList.add('dot-warn');
+
+  // Ouvre la section si fermée
+  document.getElementById('sec-inc').classList.remove('collapsed');
+
+  // Reset badge après 1 min
+  setTimeout(()=>{
     badge.className='badge badge-ok';
     badge.textContent='Normal';
+    document.getElementById('inc-dot').classList.remove('dot-warn');
+  },61000);
+}
+
+/* Render liste incidents */
+function renderFeed(items){
+  const feed=document.getElementById('inc-feed');
+  const badge=document.getElementById('inc-badge');
+  const status=document.getElementById('inc-status');
+  const dot=document.getElementById('inc-dot');
+
+  if(!items.length){
+    feed.innerHTML=`<div class="inc-item ok">
+      <div class="inc-row"><span class="inc-tag ok">✓ Trafic normal</span><span class="inc-time">${nowStr()}</span></div>
+      <div class="inc-text">Aucune perturbation signalée sur l'axe <strong>Cannes → Nice → Menton</strong>.</div>
+      <div class="inc-src">Dernière vérification : ${nowStr()}</div>
+    </div>`;
+    badge.className='badge badge-ok';badge.textContent='Normal';
     dot.classList.remove('dot-warn');
     status.textContent=`Trafic normal · màj ${nowStr()}`;
     return;
   }
 
-  const hasRed = incidents.some(i=>i.level==='crit');
-  badge.className = hasRed ? 'badge badge-warn' : 'badge badge-warn';
-  badge.textContent= `${incidents.length} alerte${incidents.length>1?'s':''}`;
-  dot.classList.add('dot-warn');
-  status.textContent=`${incidents.length} perturbation(s) · màj ${nowStr()}`;
+  // Cherche les nouveaux items (pas encore dans knownIds)
+  const newIds=items.filter(i=>!knownIds.has(i.id)).map(i=>i.id);
+  items.forEach(i=>knownIds.add(i.id));
 
-  feed.innerHTML = incidents.map(inc=>`
-    <div class="incident-item ${inc.level||''}">
-      <div class="inc-header">
+  badge.className='badge badge-warn';
+  badge.textContent=`${items.length} alerte${items.length>1?'s':''}`;
+  dot.classList.add('dot-warn');
+  status.textContent=`${items.length} perturbation(s) détectée(s) · màj ${nowStr()}`;
+
+  feed.innerHTML=items.map(inc=>`
+    <div class="inc-item ${inc.level}" data-id="${inc.id}">
+      <div class="inc-row">
         <span class="inc-tag ${inc.type}">${inc.typeLabel}</span>
         <span class="inc-time">${inc.time}</span>
       </div>
-      <div class="inc-body">${inc.body}</div>
-      <div class="inc-source">Source : ${inc.source}</div>
+      <div class="inc-text">${inc.body}</div>
+      <div class="inc-src">Source : ${inc.source}</div>
     </div>
   `).join('');
+
+  // Flash 1 min sur les nouveaux
+  newIds.forEach(nid=>{
+    const el=feed.querySelector(`[data-id="${nid}"]`);
+    if(el){
+      startFlash(el);
+      // Ouvre la section
+      document.getElementById('sec-inc').classList.remove('collapsed');
+    }
+  });
 }
 
-async function loadIncidents(){
-  incidents = [];
+/* Fetch incidents */
+async function loadIncidents(e){
+  if(e) e.stopPropagation();
+  const items=[];
 
-  // ── 1. Essayer le flux RSS TER PACA via allorigins ──
-  try {
-    const resp = await fetch(`${PROXY}${encodeURIComponent('https://www.ter.sncf.com/sud-provence-alpes-cote-d-azur/se-deplacer/info-trafic/perturbations')}`,
-      {signal:AbortSignal.timeout(6000)});
-    if(resp.ok){
-      const data = await resp.json();
-      const html = data.contents||'';
-      // Cherche des mots-clés perturbation dans le HTML
-      const lines = html.split('\n').filter(l=>
-        /cannes|nice|menton|antibes|cagnes|vintimille|retard|perturbat|supprim|incident|travaux/i.test(l)
-        && !/<(script|style|nav|header|footer)/i.test(l)
-      );
-      const unique = [...new Set(lines.map(l=>l.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim()).filter(l=>l.length>20&&l.length<300))];
-      unique.slice(0,4).forEach(txt=>{
+  try{
+    const url=encodeURIComponent('https://www.ter.sncf.com/sud-provence-alpes-cote-d-azur/se-deplacer/info-trafic/perturbations');
+    const r=await fetch(`${PROXY}${url}`,{signal:AbortSignal.timeout(7000)});
+    if(r.ok){
+      const d=await r.json();
+      const html=d.contents||'';
+      // Parse les blocs perturbation
+      const parser=new DOMParser();
+      const doc=parser.parseFromString(html,'text/html');
+      // Cherche les éléments textuels contenant des infos perturbation
+      const allText=doc.body?doc.body.innerText:'';
+      const lines=allText.split('\n')
+        .map(l=>l.trim())
+        .filter(l=>l.length>25&&l.length<350)
+        .filter(l=>/cannes|nice|menton|antibes|cagnes|vintimille|monaco|retard|perturbat|supprim|incident|travaux|interrompu/i.test(l));
+
+      const unique=[...new Set(lines)].slice(0,5);
+      unique.forEach((txt,i)=>{
         const isRetard=/retard/i.test(txt);
-        const isSupp=/supprim/i.test(txt);
-        const isInc=/incident/i.test(txt);
-        incidents.push({
-          level: isSupp||isInc?'crit':'',
-          type: isRetard?'retard':isSupp?'incident':'info',
-          typeLabel: isRetard?'⏱ Retard':isSupp?'🚫 Suppression':isInc?'⚡ Incident':'ℹ️ Info',
-          time: nowStr(),
-          body: txt.substring(0,200),
-          source: 'ter.sncf.com/paca'
+        const isSupp=/supprim|interrompu/i.test(txt);
+        const isInc=/incident|accident/i.test(txt);
+        const isWork=/travaux/i.test(txt);
+        items.push({
+          id:`paca-${i}-${txt.substring(0,20)}`,
+          level:isSupp||isInc?'crit':'',
+          type:isRetard?'retard':isSupp||isInc?'incident':isWork?'info':'info',
+          typeLabel:isRetard?'⏱ Retard':isSupp?'🚫 Suppression':isInc?'⚡ Incident':isWork?'🔧 Travaux':'ℹ️ Info',
+          time:nowStr(),
+          body:txt.replace(/</g,'&lt;').replace(/>/g,'&gt;'),
+          source:'ter.sncf.com/paca'
         });
       });
     }
-  } catch(e){ /* silencieux */ }
+  }catch(err){}
 
-  // ── 2. Détection de retards depuis les iframes (scraping des textes) ──
-  GARES_WATCH.forEach(g=>{
-    try{
-      const frame = document.querySelector(`iframe[src*="${g.id.toUpperCase()}"]`)||
-                    document.querySelector(`iframe[src*="${g.id}"]`);
-      if(!frame)return;
-      let doc; try{doc=frame.contentDocument}catch(e){return}
-      if(!doc)return;
-      const txt = doc.body ? doc.body.innerText : '';
-      const retardMatch = txt.match(/retard\s+(\d+)\s*min/i);
-      if(retardMatch){
-        incidents.push({
-          level:'',type:'retard',typeLabel:'⏱ Retard',
-          time:nowStr(),
-          body:`<strong>${g.name}</strong> — Retard de <strong>${retardMatch[1]} min</strong> détecté sur un train au départ.`,
-          source:`astucesweb.fr · gare ${g.id.toUpperCase()}`
-        });
-      }
-    }catch(e){}
-  });
-
-  // ── 3. Fallback : lire les iframes via message posting (si même domaine) ──
-  // Pas applicable cross-origin → on continue
-
-  renderIncidents();
+  renderFeed(items);
 }
 
-// Polling toutes les 90 secondes
 loadIncidents();
-setInterval(loadIncidents, 90000);
-
-// Waze loader fallback
-setTimeout(()=>gone('l-waze'),10000);
+setInterval(loadIncidents,90000);
 </script>
 </body>
 </html>
