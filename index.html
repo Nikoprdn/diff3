@@ -107,21 +107,60 @@ main{padding:12px 12px 32px;display:flex;flex-direction:column;gap:12px}
 .gares-body{padding:10px}
 .gares-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 
-.gare-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;overflow:hidden;display:flex;flex-direction:column}
-.gare-head{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:var(--s2);border-bottom:1px solid var(--border);gap:6px}
+.gare-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;overflow:hidden;display:flex;flex-direction:column;min-height:260px}
+.gare-head{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:var(--s2);border-bottom:1px solid var(--border);gap:6px;flex-shrink:0}
 .gare-name{font-family:'Rajdhani',sans-serif;font-size:.9rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;line-height:1}
 .gare-code{font-size:.58rem;color:var(--dim);background:var(--s3);border:1px solid var(--border);padding:1px 5px;border-radius:3px;letter-spacing:.07em;font-family:'Rajdhani',sans-serif;font-weight:600}
+.gare-sbar{display:flex;align-items:center;gap:6px;padding:5px 10px;background:var(--s2);border-top:1px solid var(--border);font-size:.6rem;color:var(--dim);letter-spacing:.05em;text-transform:uppercase;flex-shrink:0}
 
-.gare-iframe-wrap{position:relative;flex:1}
-.gare-iframe-wrap iframe{
-  width:100%;height:290px;border:none;display:block;
-  /* Invert colors for dark theme compatibility */
-  filter:invert(1) hue-rotate(180deg) brightness(.9) contrast(.95) saturate(.9);
+/* ─── TRAIN TABLE ─── */
+.train-table-wrap{flex:1;overflow-y:auto;max-height:280px}
+.train-table-wrap::-webkit-scrollbar{width:3px}
+.train-table-wrap::-webkit-scrollbar-track{background:var(--bg)}
+.train-table-wrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+.train-table{width:100%;border-collapse:collapse}
+.train-table thead th{
+  position:sticky;top:0;z-index:2;
+  background:var(--s3);
+  font-family:'Rajdhani',sans-serif;font-size:.62rem;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--dim);
+  padding:5px 8px;border-bottom:1px solid var(--border);text-align:left;
+  white-space:nowrap;
 }
-/* tchoo has its own dark UI, don't invert */
-.gare-iframe-wrap.no-invert iframe{filter:none}
+.train-table tbody tr{border-bottom:1px solid rgba(56,51,74,.5);transition:background .12s}
+.train-table tbody tr:hover{background:rgba(255,255,255,.03)}
+.train-table tbody td{padding:5px 8px;font-size:.75rem;vertical-align:middle;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
 
-.gare-sbar{display:flex;align-items:center;gap:6px;padding:5px 10px;background:var(--s2);border-top:1px solid var(--border);font-size:.6rem;color:var(--dim);letter-spacing:.05em;text-transform:uppercase}
+/* Heure */
+.td-heure{font-family:'Rajdhani',sans-serif;font-size:.9rem;font-weight:700;color:var(--txt);letter-spacing:.05em;width:52px}
+.td-heure.retard{color:var(--amber)}
+.td-retard{font-size:.62rem;color:var(--amber);display:block;line-height:1}
+
+/* Direction */
+.td-dir{color:var(--muted);max-width:130px}
+.td-dir strong{color:var(--txt);display:block;font-size:.76rem}
+.td-dir span{font-size:.62rem;color:var(--dim)}
+
+/* Voie */
+.td-voie{font-family:'Rajdhani',sans-serif;font-size:.78rem;font-weight:700;color:var(--dim);width:36px;text-align:center}
+
+/* Badge ligne */
+.td-ligne .ligne-badge{
+  display:inline-block;font-family:'Rajdhani',sans-serif;font-size:.62rem;font-weight:700;
+  padding:1px 5px;border-radius:3px;letter-spacing:.05em;
+  background:var(--s3);border:1px solid var(--border);color:var(--muted);
+}
+
+/* Status pill */
+.pill{display:inline-flex;align-items:center;gap:3px;font-family:'Rajdhani',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:1px 6px;border-radius:10px;white-space:nowrap}
+.pill-ok{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);color:var(--green)}
+.pill-late{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);color:var(--amber)}
+.pill-supp{background:rgba(228,3,46,.12);border:1px solid rgba(228,3,46,.3);color:var(--red)}
+
+/* Empty / error state */
+.train-empty{padding:20px;text-align:center;color:var(--dim);font-size:.75rem}
+.train-loading{padding:16px;display:flex;align-items:center;justify-content:center;gap:8px;color:var(--dim);font-size:.74rem}
 
 /* ─── INCIDENTS ─── */
 .inc-body-wrap{padding:10px;display:flex;flex-direction:column;gap:8px}
@@ -228,117 +267,105 @@ main{padding:12px 12px 32px;display:flex;flex-direction:column;gap:12px}
       <div class="gares-body">
         <div class="gares-grid">
 
-          <!-- Cannes — 43.55401,7.01873 -->
+          <!-- Cannes -->
           <div class="gare-card">
             <div class="gare-head">
               <div><div class="gare-name">Cannes</div></div>
               <div style="display:flex;align-items:center;gap:5px">
                 <span class="gare-code">CAN</span>
-                <a href="https://carto.tchoo.net/43.55401,7.01873,15.09999,0,0/8775762" target="_blank" style="color:var(--red-b);font-size:.65rem;text-decoration:none">↗</a>
+                <span class="dot" style="animation:blink 2s infinite"></span>
               </div>
             </div>
-            <div class="gare-iframe-wrap no-invert">
-              <div class="ldr" id="l0"><div class="spin"></div></div>
-              <iframe src="https://carto.tchoo.net/43.55401,7.01873,15.09999,0,0/8775762"
-                title="Cannes départs" loading="lazy" onload="gone('l0')"></iframe>
+            <div class="train-table-wrap" id="tb-cannes">
+              <div class="train-loading"><div class="spin"></div>Chargement…</div>
             </div>
-            <div class="gare-sbar"><div class="dot"></div><span>carto.tchoo.net · Cannes</span></div>
+            <div class="gare-sbar"><div class="dot"></div><span id="ts-cannes">API SNCF · Cannes</span></div>
           </div>
 
-          <!-- Nice Saint-Augustin — 43.70479,7.26174 -->
+          <!-- Nice St-Augustin -->
           <div class="gare-card">
             <div class="gare-head">
               <div><div class="gare-name">Nice St-Augustin</div></div>
               <div style="display:flex;align-items:center;gap:5px">
-                <span class="gare-code">NIC</span>
-                <a href="https://carto.tchoo.net/43.70479,7.26174,15.1,0,0/8775605" target="_blank" style="color:var(--red-b);font-size:.65rem;text-decoration:none">↗</a>
+                <span class="gare-code">NIC-A</span>
+                <span class="dot" style="animation:blink 2s infinite"></span>
               </div>
             </div>
-            <div class="gare-iframe-wrap no-invert">
-              <div class="ldr" id="l1"><div class="spin"></div></div>
-              <iframe src="https://carto.tchoo.net/43.70479,7.26174,15.1,0,0/8775605"
-                title="Nice St-Augustin départs" loading="lazy" onload="gone('l1')"></iframe>
+            <div class="train-table-wrap" id="tb-nice-augustin">
+              <div class="train-loading"><div class="spin"></div>Chargement…</div>
             </div>
-            <div class="gare-sbar"><div class="dot"></div><span>carto.tchoo.net · Nice</span></div>
+            <div class="gare-sbar"><div class="dot"></div><span id="ts-nice-augustin">API SNCF · Nice St-Augustin</span></div>
           </div>
 
-          <!-- Nice Ville — 43.70695,7.31416 -->
+          <!-- Nice-Ville -->
           <div class="gare-card">
             <div class="gare-head">
               <div><div class="gare-name">Nice-Ville</div></div>
               <div style="display:flex;align-items:center;gap:5px">
                 <span class="gare-code">NIC-V</span>
-                <a href="https://carto.tchoo.net/43.70695,7.31416,15.1,0,0/8775636" target="_blank" style="color:var(--red-b);font-size:.65rem;text-decoration:none">↗</a>
+                <span class="dot" style="animation:blink 2s infinite"></span>
               </div>
             </div>
-            <div class="gare-iframe-wrap no-invert">
-              <div class="ldr" id="l2"><div class="spin"></div></div>
-              <iframe src="https://carto.tchoo.net/43.70695,7.31416,15.1,0,0/8775636"
-                title="Nice-Ville départs" loading="lazy" onload="gone('l2')"></iframe>
+            <div class="train-table-wrap" id="tb-nice-ville">
+              <div class="train-loading"><div class="spin"></div>Chargement…</div>
             </div>
-            <div class="gare-sbar"><div class="dot"></div><span>carto.tchoo.net · Nice-Ville</span></div>
+            <div class="gare-sbar"><div class="dot"></div><span id="ts-nice-ville">API SNCF · Nice-Ville</span></div>
           </div>
 
-          <!-- Antibes — 43.55537,7.02135 (pas d'ID UIC précis, URL sans ID) -->
+          <!-- Antibes -->
           <div class="gare-card">
             <div class="gare-head">
               <div><div class="gare-name">Antibes</div></div>
               <div style="display:flex;align-items:center;gap:5px">
                 <span class="gare-code">ANT</span>
-                <a href="https://carto.tchoo.net/43.55537,7.02135,14.42379,0,0" target="_blank" style="color:var(--red-b);font-size:.65rem;text-decoration:none">↗</a>
+                <span class="dot" style="animation:blink 2s infinite"></span>
               </div>
             </div>
-            <div class="gare-iframe-wrap no-invert">
-              <div class="ldr" id="l3"><div class="spin"></div></div>
-              <iframe src="https://carto.tchoo.net/43.55537,7.02135,14.42379,0,0"
-                title="Antibes départs" loading="lazy" onload="gone('l3')"></iframe>
+            <div class="train-table-wrap" id="tb-antibes">
+              <div class="train-loading"><div class="spin"></div>Chargement…</div>
             </div>
-            <div class="gare-sbar"><div class="dot"></div><span>carto.tchoo.net · Antibes</span></div>
+            <div class="gare-sbar"><div class="dot"></div><span id="ts-antibes">API SNCF · Antibes</span></div>
           </div>
 
-          <!-- Villefranche / Beaulieu — 43.71221,7.33188 -->
+          <!-- Villefranche-sur-Mer -->
           <div class="gare-card">
             <div class="gare-head">
               <div><div class="gare-name">Villefranche / Beaulieu</div></div>
               <div style="display:flex;align-items:center;gap:5px">
                 <span class="gare-code">VFR</span>
-                <a href="https://carto.tchoo.net/43.71221,7.33188,14.21286,0,0" target="_blank" style="color:var(--red-b);font-size:.65rem;text-decoration:none">↗</a>
+                <span class="dot" style="animation:blink 2s infinite"></span>
               </div>
             </div>
-            <div class="gare-iframe-wrap no-invert">
-              <div class="ldr" id="l4"><div class="spin"></div></div>
-              <iframe src="https://carto.tchoo.net/43.71221,7.33188,14.21286,0,0"
-                title="Villefranche-Beaulieu départs" loading="lazy" onload="gone('l4')"></iframe>
+            <div class="train-table-wrap" id="tb-villefranche">
+              <div class="train-loading"><div class="spin"></div>Chargement…</div>
             </div>
-            <div class="gare-sbar"><div class="dot"></div><span>carto.tchoo.net · Villefranche/Beaulieu</span></div>
+            <div class="gare-sbar"><div class="dot"></div><span id="ts-villefranche">API SNCF · Villefranche</span></div>
           </div>
 
-          <!-- Monaco — 43.73942,7.42136 -->
+          <!-- Monaco -->
           <div class="gare-card">
             <div class="gare-head">
               <div><div class="gare-name">Monaco MC 🎲</div></div>
               <div style="display:flex;align-items:center;gap:5px">
                 <span class="gare-code">MCO</span>
-                <a href="https://carto.tchoo.net/43.73942,7.42136,14.98324,0,0" target="_blank" style="color:var(--red-b);font-size:.65rem;text-decoration:none">↗</a>
+                <span class="dot" style="animation:blink 2s infinite"></span>
               </div>
             </div>
-            <div class="gare-iframe-wrap no-invert">
-              <div class="ldr" id="l5"><div class="spin"></div></div>
-              <iframe src="https://carto.tchoo.net/43.73942,7.42136,14.98324,0,0"
-                title="Monaco départs" loading="lazy" onload="gone('l5')"></iframe>
+            <div class="train-table-wrap" id="tb-monaco">
+              <div class="train-loading"><div class="spin"></div>Chargement…</div>
             </div>
-            <div class="gare-sbar"><div class="dot"></div><span>carto.tchoo.net · Monaco</span></div>
+            <div class="gare-sbar"><div class="dot"></div><span id="ts-monaco">API SNCF · Monaco</span></div>
           </div>
 
         </div><!-- /gares-grid -->
       </div>
       <div class="sbar">
         <div class="dot"></div>
-        <span>Source : carto.tchoo.net · API SNCF</span>
+        <span>API SNCF Navitia · localhost:3000</span>
         <span class="sep">·</span>
-        <span>5 prochains départs · hors TGV</span>
+        <span>5 prochains départs · hors TGV/Intercités</span>
         <span class="sep">·</span>
-        <span>Rafraîchissement automatique</span>
+        <span id="ferro-last-update">Rafraîchissement toutes les 30s</span>
       </div>
     </div>
   </div>
@@ -467,6 +494,163 @@ setTimeout(()=>gone('l-waze'),10000);
 function toggleSection(id){
   document.getElementById(id).classList.toggle('collapsed');
 }
+
+/* ═══════════════════════════════════════════
+   FERROVIAIRE — API SNCF via backend local
+═══════════════════════════════════════════ */
+const API_BASE = 'http://localhost:3000';
+
+// Modes à exclure (TGV, Intercités grande vitesse)
+const EXCLUDED_MODES = ['tgv','intercites de nuit','eurostar','thalys','lyria'];
+
+// Gares à surveiller : label affiché, nom pour l'API, id du tableau
+const GARES = [
+  { id:'cannes',         label:'Cannes',              query:'Cannes',              tb:'tb-cannes',         ts:'ts-cannes'         },
+  { id:'nice-augustin',  label:'Nice St-Augustin',    query:'Nice Saint-Augustin', tb:'tb-nice-augustin',  ts:'ts-nice-augustin'  },
+  { id:'nice-ville',     label:'Nice-Ville',          query:'Nice Ville',          tb:'tb-nice-ville',     ts:'ts-nice-ville'     },
+  { id:'antibes',        label:'Antibes',             query:'Antibes',             tb:'tb-antibes',         ts:'ts-antibes'        },
+  { id:'villefranche',   label:'Villefranche',        query:'Villefranche sur Mer',tb:'tb-villefranche',   ts:'ts-villefranche'   },
+  { id:'monaco',         label:'Monaco',              query:'Monaco Monte-Carlo',  tb:'tb-monaco',          ts:'ts-monaco'         },
+];
+
+/* ── Formate une date SNCF "20250318T143000" → "14:30" ── */
+function fmtSncfTime(dt){
+  if(!dt||dt.length<15) return '--:--';
+  return dt.substring(9,11)+':'+dt.substring(11,13);
+}
+
+/* ── Calcule le retard en minutes entre deux dates SNCF ── */
+function retardMin(realtime, theoretical){
+  if(!realtime||!theoretical) return 0;
+  const toMin = s => {
+    const h=parseInt(s.substring(9,11),10);
+    const m=parseInt(s.substring(11,13),10);
+    return h*60+m;
+  };
+  return toMin(realtime)-toMin(theoretical);
+}
+
+/* ── Rend le tableau HTML pour une gare ── */
+function renderTrainTable(tbId, departures, disruptions){
+  const wrap = document.getElementById(tbId);
+  if(!wrap) return;
+
+  // Filtre : exclut TGV/IC, garde 5 premiers
+  const filtered = departures
+    .filter(d => {
+      const mode = (d.physicalMode||d.commercialMode||'').toLowerCase();
+      return !EXCLUDED_MODES.some(ex => mode.includes(ex));
+    })
+    .slice(0, 5);
+
+  if(!filtered.length){
+    wrap.innerHTML = '<div class="train-empty">Aucun départ TER disponible</div>';
+    return;
+  }
+
+  // Construit l'index des perturbations pour colorer
+  const disruptedLines = new Set(disruptions.map(d=>(d.impacted_objects||[]).map(o=>o.pt_object?.id||'')).flat());
+
+  const rows = filtered.map(dep => {
+    const rt    = dep.realtime;
+    const theo  = dep.theoretical;
+    const delay = retardMin(rt, theo);
+    const heureAff = fmtSncfTime(rt || theo);
+    const isLate = delay > 0;
+    const isCancelled = (dep.physicalMode||'').toLowerCase().includes('supprim');
+
+    // Direction — garde seulement la dernière ville (après la virgule ou tiret final)
+    let dir = dep.direction || 'N/A';
+    if(dir.includes(' vers ')) dir = dir.split(' vers ').pop();
+    if(dir.includes(',')) dir = dir.split(',').pop().trim();
+
+    const modeLower = (dep.physicalMode||dep.commercialMode||'').toLowerCase();
+    const isOuigo = modeLower.includes('ouigo');
+    const isZou   = modeLower.includes('zou') || modeLower.includes('ter');
+
+    let pill = `<span class="pill pill-ok">À l'heure</span>`;
+    if(isCancelled)  pill = `<span class="pill pill-supp">Supprimé</span>`;
+    else if(isLate)  pill = `<span class="pill pill-late">+${delay} min</span>`;
+
+    let ligneBadge = dep.line ? `<span class="ligne-badge">${dep.line}</span>` : '';
+
+    return `<tr>
+      <td class="td-heure ${isLate?'retard':''}">
+        ${heureAff}
+        ${isLate&&theo ? `<span class="td-retard">${fmtSncfTime(theo)}</span>` : ''}
+      </td>
+      <td class="td-dir">
+        <strong>${dir}</strong>
+        <span>${dep.network||''}</span>
+      </td>
+      <td class="td-ligne">${ligneBadge}</td>
+      <td>${pill}</td>
+      <td class="td-voie">${dep.platform||'—'}</td>
+    </tr>`;
+  }).join('');
+
+  wrap.innerHTML = `
+    <table class="train-table">
+      <thead>
+        <tr>
+          <th>Heure</th>
+          <th>Destination</th>
+          <th>Train</th>
+          <th>État</th>
+          <th>Voie</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+/* ── Fetch une gare ── */
+async function fetchGare(gare){
+  try{
+    const url = `${API_BASE}/api/trains/departures?station=${encodeURIComponent(gare.query)}&count=15`;
+    const r = await fetch(url, {signal: AbortSignal.timeout(8000)});
+    if(!r.ok) throw new Error(`HTTP ${r.status}`);
+    const data = await r.json();
+    renderTrainTable(gare.tb, data.departures||[], data.disruptions||[]);
+    const ts = document.getElementById(gare.ts);
+    if(ts) ts.textContent = `${data.station||gare.label} · màj ${nowStr()}`;
+
+    // Remonte les disruptions dans le feed incidents
+    if(data.disruptions && data.disruptions.length){
+      data.disruptions.forEach(d => {
+        const msg = d.messages?.[0]?.text || d.cause || 'Perturbation signalée';
+        const id  = d.id || `disr-${gare.id}-${Date.now()}`;
+        if(!knownTweetIds.has(id)){
+          knownTweetIds.add(id);
+          const tw = {
+            id,
+            text: `<strong>${gare.label}</strong> — ${msg}`,
+            time: nowStr()
+          };
+          allTweets.unshift(tw);
+          injectTweet(tw, true);
+          document.getElementById('sec-inc').classList.remove('collapsed');
+        }
+      });
+    }
+  } catch(err){
+    const wrap = document.getElementById(gare.tb);
+    if(wrap) wrap.innerHTML = `<div class="train-empty" style="color:var(--red);font-size:.68rem">
+      Erreur : ${err.message}<br><span style="color:var(--dim)">Vérifier que le serveur tourne sur localhost:3000</span>
+    </div>`;
+  }
+}
+
+/* ── Poll toutes les gares ── */
+async function pollAllGares(){
+  await Promise.all(GARES.map(g => fetchGare(g)));
+  const el = document.getElementById('ferro-last-update');
+  if(el) el.textContent = `Màj ${nowStr()}`;
+}
+
+// Premier chargement immédiat + polling 30s
+pollAllGares();
+setInterval(pollAllGares, 30000);
 
 /* ─── INCIDENTS — Scraping @deruellehugo via allorigins ─── */
 const PROXY   = 'https://api.allorigins.win/get?url=';
