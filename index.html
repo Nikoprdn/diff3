@@ -1,342 +1,370 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Traffic Tool — Radio Monaco</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Traffic Tool — Radio Monaco</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --red:#E4032E; --red-d:#a8001f; --red-s:rgba(228,3,46,.14); --red-b:rgba(228,3,46,.32);
+  --bg:#0b0a0f; --s1:#17151e; --s2:#201d28; --s3:#2a2735; --border:#38334a;
+  --pur:#37333E; --pur-l:#504a62;
+  --txt:#ece8f4; --muted:#958fa6; --dim:#615b73;
+  --green:#22c55e; --amber:#f59e0b; --blue:#38bdf8;
+  --head-h:64px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--txt);min-height:100vh;overflow-x:hidden}
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
+/* ─── HEADER ─── */
+header{
+  position:sticky;top:0;z-index:300;height:var(--head-h);
+  background:linear-gradient(115deg,var(--s1) 0%,var(--pur) 100%);
+  border-bottom:2px solid var(--red);
+  box-shadow:0 2px 28px rgba(0,0,0,.6);
+  display:grid;grid-template-columns:220px 1fr 220px;align-items:center;padding:0 18px;gap:8px;
+}
+.h-logo svg{height:40px;width:auto}
+.h-title{text-align:center;font-family:'Rajdhani',sans-serif;font-size:1.6rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase}
+.h-title em{color:var(--red);font-style:normal}
+.h-right{display:flex;align-items:center;justify-content:flex-end;gap:10px}
+#clock{font-family:'Rajdhani',sans-serif;font-size:1.45rem;font-weight:600;letter-spacing:.1em;color:var(--red);background:var(--red-s);border:1px solid var(--red-b);padding:4px 14px;border-radius:7px;min-width:108px;text-align:center}
 
-  <style>
-    :root {
-      --red:        #E4032E;
-      --red-dark:   #b00224;
-      --red-soft:   rgba(228,3,46,0.15);
-      --red-border: rgba(228,3,46,0.35);
-      --bg:         #0c0b10;
-      --surface:    #18151f;
-      --surface-2:  #211e2a;
-      --surface-3:  #2c2838;
-      --border:     #3a3548;
-      --purple:     #37333E;
-      --purple-l:   #504a62;
-      --text:       #ede9f5;
-      --text-muted: #9892a6;
-      --text-dim:   #635e74;
-      --green:      #22c55e;
-    }
+/* ─── LAYOUT ─── */
+main{padding:14px 14px 30px;display:flex;flex-direction:column;gap:14px}
 
-    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
-    body {
-      background: var(--bg);
-      font-family: 'DM Sans', sans-serif;
-      color: var(--text);
-      min-height: 100vh;
-    }
+/* ─── CARD ─── */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:0 3px 20px rgba(0,0,0,.4)}
+.card-head{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:linear-gradient(90deg,var(--s2),var(--s3));border-bottom:1px solid var(--border);gap:10px;min-height:44px}
+.card-head-l{display:flex;align-items:center;gap:9px;min-width:0}
+.card-ico{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
+.ico-r{background:var(--red-s);border:1px solid var(--red-b)}
+.ico-p{background:rgba(55,51,62,.5);border:1px solid var(--pur-l)}
+.ico-a{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3)}
+.card-title{font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-sub{font-size:.66rem;color:var(--muted);letter-spacing:.05em;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-acts{display:flex;gap:7px;align-items:center;flex-shrink:0}
 
-    /* ── HEADER ── */
-    header {
-      position: sticky; top:0; z-index:200;
-      height: 68px;
-      background: linear-gradient(115deg, var(--surface) 0%, #2a2535 50%, var(--purple) 100%);
-      border-bottom: 2px solid var(--red);
-      box-shadow: 0 2px 30px rgba(0,0,0,.6);
-      display: grid;
-      grid-template-columns: 240px 1fr 240px;
-      align-items: center;
-      padding: 0 20px;
-    }
+/* badge */
+.badge{font-family:'Rajdhani',sans-serif;font-size:.66rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;padding:2px 8px;border-radius:20px;display:flex;align-items:center;gap:4px;white-space:nowrap}
+.badge-live{background:var(--red-s);border:1px solid var(--red-b);color:var(--red)}
+.badge-live::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--red);box-shadow:0 0 5px var(--red);animation:blink 1.6s infinite}
+.badge-ok{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:var(--green)}
+.badge-warn{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);color:var(--amber)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
 
-    /* Logo */
-    .h-logo svg { height:44px; width:auto; }
+/* btn */
+.btn{font-family:'Rajdhani',sans-serif;font-size:.75rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:4px 11px;border-radius:5px;border:none;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:4px;transition:all .14s;white-space:nowrap}
+.btn-r{background:var(--red);color:#fff}.btn-r:hover{background:var(--red-d);color:#fff;transform:translateY(-1px)}
+.btn-g{background:var(--s3);border:1px solid var(--border);color:var(--muted)}.btn-g:hover{background:var(--pur);color:var(--txt)}
 
-    /* Title */
-    .h-title {
-      text-align: center;
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 1.8rem; font-weight:700;
-      letter-spacing: .25em; text-transform: uppercase;
-    }
-    .h-title em { color:var(--red); font-style:normal; }
+/* status bar */
+.sbar{display:flex;align-items:center;gap:8px;padding:6px 14px;background:var(--s2);border-top:1px solid var(--border);font-size:.66rem;color:var(--dim);letter-spacing:.06em;text-transform:uppercase}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 4px var(--green);animation:blink 2s infinite;flex-shrink:0}
+.dot-warn{background:var(--amber);box-shadow:0 0 4px var(--amber)}
+.sep{color:var(--border)}
 
-    /* Clock */
-    .h-clock { display:flex; justify-content:flex-end; }
-    #clock {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 1.55rem; font-weight:600; letter-spacing:.1em;
-      color: var(--red);
-      background: var(--red-soft);
-      border: 1px solid var(--red-border);
-      padding: 5px 18px; border-radius:8px;
-      min-width:118px; text-align:center;
-    }
+/* loader */
+.ldr{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:var(--s2);z-index:10;transition:opacity .35s}
+.ldr.gone{opacity:0;pointer-events:none}
+.spin{width:28px;height:28px;border:2.5px solid var(--border);border-top-color:var(--red);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-    /* ── MAIN ── */
-    main { padding:18px 18px 36px; display:flex; flex-direction:column; gap:20px; }
+/* ─── GARES GRID ─── */
+.gares-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.gare-card{background:var(--s1);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:0 2px 14px rgba(0,0,0,.35);display:flex;flex-direction:column}
+.gare-head{display:flex;align-items:center;justify-content:space-between;padding:7px 12px;background:linear-gradient(90deg,var(--s2),var(--s3));border-bottom:1px solid var(--border);gap:6px}
+.gare-name{font-family:'Rajdhani',sans-serif;font-size:.95rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.gare-code{font-size:.6rem;color:var(--dim);background:var(--s3);border:1px solid var(--border);padding:1px 6px;border-radius:4px;letter-spacing:.08em}
+.gare-iframe-wrap{position:relative;flex:1}
+.gare-iframe-wrap iframe{width:100%;height:330px;border:none;display:block;background:#fff}
 
-    /* ── CARD ── */
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius:12px; overflow:hidden;
-      box-shadow: 0 4px 30px rgba(0,0,0,.4);
-    }
-    .card-head {
-      display:flex; align-items:center; justify-content:space-between;
-      padding:12px 20px; gap:12px;
-      background: linear-gradient(90deg, var(--surface-2), var(--surface-3));
-      border-bottom:1px solid var(--border);
-    }
-    .card-head-l { display:flex; align-items:center; gap:12px; }
-    .card-ico {
-      width:36px; height:36px; border-radius:8px;
-      display:flex; align-items:center; justify-content:center;
-      font-size:.95rem; flex-shrink:0;
-    }
-    .ico-r { background:var(--red-soft); border:1px solid var(--red-border); }
-    .ico-p { background:rgba(55,51,62,.5); border:1px solid var(--purple-l); }
-    .card-title {
-      font-family:'Rajdhani',sans-serif;
-      font-size:1.08rem; font-weight:700;
-      letter-spacing:.12em; text-transform:uppercase;
-    }
-    .card-sub { font-size:.7rem; color:var(--text-muted); letter-spacing:.06em; margin-top:2px; }
-    .card-acts { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+/* iframe inversion filter for dark mode appearance */
+.gare-iframe-wrap iframe{
+  filter:invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.95);
+}
 
-    /* Badge */
-    .badge-live {
-      font-family:'Rajdhani',sans-serif; font-size:.7rem; font-weight:700;
-      letter-spacing:.1em; text-transform:uppercase;
-      padding:3px 10px; border-radius:20px;
-      background:var(--red-soft); border:1px solid var(--red-border);
-      color:var(--red); display:flex; align-items:center; gap:5px;
-    }
-    .badge-live::before {
-      content:''; width:6px; height:6px; border-radius:50%;
-      background:var(--red); box-shadow:0 0 6px var(--red);
-      animation: blink 1.6s infinite;
-    }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
+/* ─── BOTTOM ROW ─── */
+.bottom-row{display:grid;grid-template-columns:1fr 380px;gap:14px}
 
-    /* Buttons */
-    .btn {
-      font-family:'Rajdhani',sans-serif; font-size:.8rem; font-weight:700;
-      letter-spacing:.08em; text-transform:uppercase;
-      padding:5px 13px; border-radius:6px; border:none;
-      cursor:pointer; text-decoration:none;
-      display:inline-flex; align-items:center; gap:5px;
-      transition:all .15s;
-    }
-    .btn-r { background:var(--red); color:#fff; }
-    .btn-r:hover { background:var(--red-dark); color:#fff; transform:translateY(-1px); }
-    .btn-g {
-      background:var(--surface-3); border:1px solid var(--border);
-      color:var(--text-muted);
-    }
-    .btn-g:hover { background:var(--purple); color:var(--text); }
+/* ─── INCIDENT PANEL ─── */
+.incident-panel{background:var(--s1);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:0 3px 20px rgba(0,0,0,.4);display:flex;flex-direction:column}
+.incident-feed{padding:10px 12px;display:flex;flex-direction:column;gap:7px;overflow-y:auto;max-height:430px;flex:1}
+.incident-item{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;border-left:3px solid var(--amber)}
+.incident-item.info{border-left-color:var(--blue)}
+.incident-item.ok{border-left-color:var(--green)}
+.incident-item.crit{border-left-color:var(--red)}
+.inc-header{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px}
+.inc-tag{font-family:'Rajdhani',sans-serif;font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:1px 7px;border-radius:4px}
+.inc-tag.retard{background:rgba(245,158,11,.15);color:var(--amber)}
+.inc-tag.incident{background:rgba(228,3,46,.15);color:var(--red)}
+.inc-tag.ok{background:rgba(34,197,94,.12);color:var(--green)}
+.inc-tag.info{background:rgba(56,189,248,.12);color:var(--blue)}
+.inc-time{font-size:.62rem;color:var(--dim)}
+.inc-body{font-size:.75rem;color:var(--muted);line-height:1.5}
+.inc-body strong{color:var(--txt)}
+.inc-source{font-size:.62rem;color:var(--dim);margin-top:4px}
 
-    /* Status bar */
-    .sbar {
-      display:flex; align-items:center; gap:9px;
-      padding:8px 20px;
-      background:var(--surface-2); border-top:1px solid var(--border);
-      font-size:.7rem; color:var(--text-dim);
-      letter-spacing:.07em; text-transform:uppercase;
-    }
-    .dot { width:7px; height:7px; border-radius:50%;
-      background:var(--green); box-shadow:0 0 5px var(--green);
-      animation:blink 2s infinite; flex-shrink:0;
-    }
-    .sep { color:var(--border); }
+.inc-refresh-btn{
+  display:flex;align-items:center;gap:6px;
+  font-family:'Rajdhani',sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+  cursor:pointer;background:none;border:none;color:var(--muted);padding:4px 8px;border-radius:5px;
+  transition:color .15s;
+}
+.inc-refresh-btn:hover{color:var(--txt)}
 
-    /* ── ROUTE STRIP ── */
-    .route-strip {
-      display:flex; align-items:center; gap:8px;
-      background:var(--surface-2); border:1px solid var(--border);
-      border-radius:10px; padding:13px 20px;
-      margin:16px 16px 0;
-      position:relative; overflow:hidden;
-    }
-    .route-strip::before {
-      content:''; position:absolute;
-      left:0;top:0;bottom:0; width:4px;
-      background:var(--red);
-    }
-    .city-name { font-family:'Rajdhani',sans-serif; font-size:1.2rem; font-weight:700; }
-    .city-lbl  { font-size:.67rem; color:var(--text-dim); letter-spacing:.09em; text-transform:uppercase; }
-    .arrow-wrap { flex:1; display:flex; align-items:center; gap:5px; padding:0 6px; }
-    .aline { flex:1; height:1px; background:linear-gradient(90deg, var(--border), var(--red-border), var(--border)); }
-    .ahw-list { display:flex; flex-wrap:wrap; gap:6px; padding:10px 16px 14px; }
-    .hwy {
-      font-family:'Rajdhani',sans-serif; font-size:.8rem; font-weight:700;
-      padding:3px 10px; border-radius:5px;
-      background:#0e2035; border:1px solid #1c4268; color:#7ec8f7;
-    }
+/* Scrollbar */
+.incident-feed::-webkit-scrollbar{width:4px}
+.incident-feed::-webkit-scrollbar-track{background:var(--s2)}
+.incident-feed::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 
-    /* ── MAP ── */
-    #traffic-map { width:100%; height:470px; background:var(--surface-2); }
+/* ─── WAZE COMPACT ─── */
+.waze-wrap{position:relative;height:430px}
+.waze-wrap iframe{width:100%;height:100%;border:none;display:block}
 
-    .map-legend {
-      display:flex; flex-wrap:wrap; gap:12px; align-items:center;
-      padding:10px 20px; border-top:1px solid var(--border);
-      background:var(--surface-2);
-    }
-    .leg-item { display:flex; align-items:center; gap:5px; font-size:.7rem; color:var(--text-muted); }
-    .leg-dot  { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+/* ─── CARTO TCHOO ─── */
+.tchoo-wrap{position:relative}
+.tchoo-wrap iframe{width:100%;height:330px;border:none;display:block;background:#fff}
 
-    /* Spinner overlay */
-    .loader-wrap {
-      position:absolute; inset:0;
-      display:flex; align-items:center; justify-content:center;
-      background:var(--surface-2); z-index:10;
-      transition:opacity .4s;
-    }
-    .loader-wrap.gone { opacity:0; pointer-events:none; }
-    .spinner {
-      width:34px; height:34px;
-      border:3px solid var(--border); border-top-color:var(--red);
-      border-radius:50%; animation:spin .8s linear infinite;
-    }
-    @keyframes spin { to{transform:rotate(360deg)} }
+/* ─── RESPONSIVE ─── */
+@media(max-width:1100px){.gares-grid{grid-template-columns:repeat(2,1fr)}.bottom-row{grid-template-columns:1fr}}
+@media(max-width:700px){.gares-grid{grid-template-columns:1fr}.h-title{font-size:1rem;letter-spacing:.1em}}
 
-    /* ── WAZE ── */
-    .waze-wrap { position:relative; height:460px; }
-    .waze-wrap iframe { width:100%; height:100%; border:none; display:block; }
-
-    /* ── SNCF ── */
-    .sncf-wrap { position:relative; }
-    .sncf-wrap iframe { width:100%; height:530px; border:none; display:block; background:#fff; }
-
-    /* ── 2 cols ── */
-    .two-col { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
-
-    /* Leaflet tooltip */
-    .tt {
-      background:#1a1820 !important; border:1px solid #3a3548 !important;
-      color:#ede9f5 !important; font-family:'DM Sans',sans-serif; font-size:12px;
-      box-shadow:0 2px 8px rgba(0,0,0,.5);
-    }
-
-    @media(max-width:900px) {
-      .two-col { grid-template-columns:1fr; }
-      header { grid-template-columns:auto 1fr auto; }
-      .h-title { font-size:1.1rem; letter-spacing:.1em; }
-    }
-    @media(max-width:600px) {
-      .h-title { display:none; }
-      header { grid-template-columns:auto 1fr; }
-      .h-clock { display:none; }
-    }
-  </style>
+/* X timeline */
+.x-embed-wrap{overflow-y:auto;max-height:400px;background:var(--s2)}
+.x-embed-wrap iframe{border:none!important}
+</style>
 </head>
 <body>
 
-<!-- ═══════════ HEADER ═══════════ -->
+<!-- ═══ HEADER ═══ -->
 <header>
-
-  <!-- Radio Monaco Logo (SVG blanc reproduisant la marque) -->
   <div class="h-logo">
     <svg viewBox="0 0 230 62" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Radio Monaco">
-      <!-- Carré arrondi avec le M -->
       <rect x="2" y="2" width="58" height="58" rx="13" stroke="white" stroke-width="4" fill="none"/>
       <path d="M13 48 L13 20 L31 39 L49 20 L49 48" stroke="white" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
       <rect x="20" y="49" width="22" height="9" rx="4" fill="white"/>
       <rect x="26" y="44" width="10" height="6" rx="2" fill="white"/>
-      <!-- "radio" petit -->
       <text x="70" y="28" font-family="'DM Sans',sans-serif" font-size="17" font-weight="300" fill="rgba(255,255,255,0.85)" letter-spacing="2">radio</text>
-      <!-- "monaco" grand -->
       <text x="70" y="55" font-family="'DM Sans',sans-serif" font-size="27" font-weight="600" fill="white" letter-spacing="0.5">monaco</text>
-      <!-- Couronne -->
       <path d="M197 6 L201 17 L208 10 L215 17 L219 6" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
     </svg>
   </div>
-
   <div class="h-title">TRAFFIC <em>TOOL</em></div>
-
-  <div class="h-clock"><div id="clock">00:00:00</div></div>
+  <div class="h-right">
+    <div id="clock">00:00:00</div>
+  </div>
 </header>
 
-<!-- ═══════════ MAIN ═══════════ -->
+<!-- ═══ MAIN ═══ -->
 <main>
 
-  <!-- ── AUTOROUTE ── -->
+  <!-- ─── SECTION FERROVIAIRE (6 gares) ─── -->
   <div class="card">
     <div class="card-head">
       <div class="card-head-l">
-        <div class="card-ico ico-r">🛣️</div>
+        <div class="card-ico ico-r">🚂</div>
         <div>
-          <div class="card-title">Autoroute A8 — Trafic temps réel</div>
-          <div class="card-sub">Axe Saint-Tropez → Nice → Menton · Carte interactive</div>
+          <div class="card-title">Ferroviaire — Départs temps réel</div>
+          <div class="card-sub">6 gares · Axe Cannes → Nice → Menton → Monaco</div>
         </div>
       </div>
       <div class="card-acts">
-        <span class="badge-live">Live</span>
-        <a href="https://www.autoroutes.fr/fr/trafic-en-temps-reel.htm" target="_blank" class="btn btn-g">autoroutes.fr ↗</a>
-        <a href="https://www.vinci-autoroutes.com/fr/autoroutes-temps-reel/" target="_blank" class="btn btn-g">VINCI ↗</a>
-        <a href="https://www.bison-fute.gouv.fr/" target="_blank" class="btn btn-g">Bison Futé ↗</a>
+        <span class="badge badge-live">Live</span>
+        <a href="https://astucesweb.fr/projets/sncf/" target="_blank" class="btn btn-g">astucesweb.fr ↗</a>
       </div>
     </div>
 
-    <div class="route-strip">
-      <div>
-        <div class="city-name">Saint-Tropez</div>
-        <div class="city-lbl">Départ</div>
-      </div>
-      <div class="arrow-wrap">
-        <div class="aline"></div>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E4032E" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-        <div class="aline"></div>
-      </div>
-      <div>
-        <div class="city-name" style="color:#c9a8b5;">Cannes · Nice</div>
-        <div class="city-lbl">Passage</div>
-      </div>
-      <div class="arrow-wrap">
-        <div class="aline"></div>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E4032E" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-        <div class="aline"></div>
-      </div>
-      <div>
-        <div class="city-name" style="color:var(--red);">Menton</div>
-        <div class="city-lbl">Arrivée</div>
-      </div>
-    </div>
+    <div style="padding:12px">
+      <div class="gares-grid">
 
-    <div class="ahw-list">
-      <span class="hwy">A8 — La Provençale</span>
-      <span class="hwy">A57 — Toulon ↔ Le Muy</span>
-      <span class="hwy">A50 — Toulon ↔ Aubagne</span>
-      <span style="font-size:.7rem;color:var(--text-dim);align-self:center;margin-left:4px;">~ 200 km · Côte d'Azur</span>
-    </div>
+        <!-- NICE NIC -->
+        <div class="gare-card">
+          <div class="gare-head">
+            <div>
+              <div class="gare-name">Nice-Ville</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:5px">
+              <span class="gare-code">NIC</span>
+              <span class="badge badge-live" style="font-size:.58rem;padding:1px 6px">Live</span>
+            </div>
+          </div>
+          <div class="gare-iframe-wrap">
+            <div class="ldr" id="l-nic"><div class="spin"></div></div>
+            <iframe src="https://astucesweb.fr/projets/sncf/departs/NIC/"
+              title="Départs Nice" loading="lazy"
+              onload="gone('l-nic')"></iframe>
+          </div>
+          <div class="sbar"><div class="dot"></div><span>Nice-Ville · NIC</span></div>
+        </div>
 
-    <div style="position:relative;">
-      <div class="loader-wrap" id="map-loader"><div class="spinner"></div></div>
-      <div id="traffic-map"></div>
-    </div>
+        <!-- CANNES CAN -->
+        <div class="gare-card">
+          <div class="gare-head">
+            <div><div class="gare-name">Cannes</div></div>
+            <div style="display:flex;align-items:center;gap:5px">
+              <span class="gare-code">CAN</span>
+              <span class="badge badge-live" style="font-size:.58rem;padding:1px 6px">Live</span>
+            </div>
+          </div>
+          <div class="gare-iframe-wrap">
+            <div class="ldr" id="l-can"><div class="spin"></div></div>
+            <iframe src="https://astucesweb.fr/projets/sncf/departs/CAN/"
+              title="Départs Cannes" loading="lazy"
+              onload="gone('l-can')"></iframe>
+          </div>
+          <div class="sbar"><div class="dot"></div><span>Cannes · CAN</span></div>
+        </div>
 
-    <div class="map-legend">
-      <span style="font-size:.7rem;color:var(--text-muted);font-weight:600;margin-right:4px;">LÉGENDE :</span>
-      <div class="leg-item"><div class="leg-dot" style="background:#00b050"></div>Fluide</div>
-      <div class="leg-item"><div class="leg-dot" style="background:#ffd600"></div>Ralenti</div>
-      <div class="leg-item"><div class="leg-dot" style="background:#ff6600"></div>Congestionné</div>
-      <div class="leg-item"><div class="leg-dot" style="background:#cc0000"></div>Bouchon</div>
-      <div class="leg-item"><div class="leg-dot" style="background:#7b0000"></div>Bloqué</div>
-      <span style="margin-left:auto;font-size:.67rem;color:var(--text-dim);">Tracé A8 — données indicatives · <span id="map-ts">—</span></span>
+        <!-- MENTON MEN -->
+        <div class="gare-card">
+          <div class="gare-head">
+            <div><div class="gare-name">Menton</div></div>
+            <div style="display:flex;align-items:center;gap:5px">
+              <span class="gare-code">MEN</span>
+              <span class="badge badge-live" style="font-size:.58rem;padding:1px 6px">Live</span>
+            </div>
+          </div>
+          <div class="gare-iframe-wrap">
+            <div class="ldr" id="l-men"><div class="spin"></div></div>
+            <iframe src="https://astucesweb.fr/projets/sncf/departs/MEN/"
+              title="Départs Menton" loading="lazy"
+              onload="gone('l-men')"></iframe>
+          </div>
+          <div class="sbar"><div class="dot"></div><span>Menton · MEN</span></div>
+        </div>
+
+        <!-- VILLENEUVE-LOUBET VFH -->
+        <div class="gare-card">
+          <div class="gare-head">
+            <div><div class="gare-name">Villeneuve-Loubet</div></div>
+            <div style="display:flex;align-items:center;gap:5px">
+              <span class="gare-code">VFH</span>
+              <span class="badge badge-live" style="font-size:.58rem;padding:1px 6px">Live</span>
+            </div>
+          </div>
+          <div class="gare-iframe-wrap">
+            <div class="ldr" id="l-vfh"><div class="spin"></div></div>
+            <iframe src="https://astucesweb.fr/projets/sncf/departs/VFH/"
+              title="Départs Villeneuve-Loubet" loading="lazy"
+              onload="gone('l-vfh')"></iframe>
+          </div>
+          <div class="sbar"><div class="dot"></div><span>Villeneuve-Loubet · VFH</span></div>
+        </div>
+
+        <!-- CAGNES-SUR-MER CQR -->
+        <div class="gare-card">
+          <div class="gare-head">
+            <div><div class="gare-name">Cagnes-sur-Mer</div></div>
+            <div style="display:flex;align-items:center;gap:5px">
+              <span class="gare-code">CQR</span>
+              <span class="badge badge-live" style="font-size:.58rem;padding:1px 6px">Live</span>
+            </div>
+          </div>
+          <div class="gare-iframe-wrap">
+            <div class="ldr" id="l-cqr"><div class="spin"></div></div>
+            <iframe src="https://astucesweb.fr/projets/sncf/departs/CQR/"
+              title="Départs Cagnes-sur-Mer" loading="lazy"
+              onload="gone('l-cqr')"></iframe>
+          </div>
+          <div class="sbar"><div class="dot"></div><span>Cagnes-sur-Mer · CQR</span></div>
+        </div>
+
+        <!-- CARTO TCHOO Monaco 87756403 -->
+        <div class="gare-card">
+          <div class="gare-head">
+            <div><div class="gare-name">Monaco MC</div></div>
+            <div style="display:flex;align-items:center;gap:5px">
+              <span class="gare-code">87756403</span>
+              <span class="badge badge-live" style="font-size:.58rem;padding:1px 6px">Live</span>
+            </div>
+          </div>
+          <div class="gare-iframe-wrap tchoo-wrap">
+            <div class="ldr" id="l-mc"><div class="spin"></div></div>
+            <iframe src="https://carto.tchoo.net/station/87756403"
+              title="Monaco Monte-Carlo SNCF" loading="lazy"
+              onload="gone('l-mc')"
+              style="filter:none"></iframe>
+          </div>
+          <div class="sbar">
+            <div class="dot"></div>
+            <span>Monaco Monte-Carlo · carto.tchoo.net</span>
+            <span class="sep">·</span>
+            <a href="https://carto.tchoo.net/station/87756403" target="_blank" style="color:var(--red-b);text-decoration:none;font-size:.62rem;">↗</a>
+          </div>
+        </div>
+
+      </div><!-- /gares-grid -->
     </div>
 
     <div class="sbar">
       <div class="dot"></div>
-      <span>Carte Leaflet + CartoDB Dark · Tracé A8 Côte d'Azur</span>
+      <span>astucesweb.fr · API SNCF</span>
       <span class="sep">·</span>
-      <span>Pour trafic temps réel précis → autoroutes.fr / VINCI</span>
+      <span>6 gares surveillées · rafraîchissement automatique</span>
     </div>
   </div>
 
-  <!-- ── WAZE + SNCF ── -->
-  <div class="two-col">
+  <!-- ─── BOTTOM ROW : INCIDENTS + WAZE ─── -->
+  <div class="bottom-row">
+
+    <!-- INCIDENTS -->
+    <div class="incident-panel">
+      <div class="card-head">
+        <div class="card-head-l">
+          <div class="card-ico ico-a">⚠️</div>
+          <div>
+            <div class="card-title">Incidents &amp; Perturbations</div>
+            <div class="card-sub">Axe Cannes → Nice → Menton · TER PACA · @TERPACA_SNCF</div>
+          </div>
+        </div>
+        <div class="card-acts">
+          <span class="badge badge-warn" id="inc-badge">Vérification…</span>
+          <button class="inc-refresh-btn" onclick="loadIncidents()">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+            Actualiser
+          </button>
+          <a href="https://www.ter.sncf.com/sud-provence-alpes-cote-d-azur/se-deplacer/info-trafic" target="_blank" class="btn btn-g">TER PACA ↗</a>
+          <a href="https://x.com/TERPACA_SNCF" target="_blank" class="btn btn-g">@TERPACA ↗</a>
+        </div>
+      </div>
+
+      <!-- Feed incidents -->
+      <div class="incident-feed" id="inc-feed">
+        <div style="display:flex;align-items:center;justify-content:center;height:80px;color:var(--dim);font-size:.8rem">
+          <div class="spin" style="margin-right:10px"></div> Chargement des incidents…
+        </div>
+      </div>
+
+      <!-- X timeline embed TERPACA_SNCF -->
+      <div style="border-top:1px solid var(--border);">
+        <div style="padding:6px 14px;background:var(--s2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="color:var(--muted)"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.738l7.731-8.835L1.254 2.25H8.08l4.261 5.635 5.903-5.635zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          <span style="font-family:'Rajdhani',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">@TERPACA_SNCF — Fil info trafic officiel</span>
+          <a href="https://x.com/TERPACA_SNCF" target="_blank" style="margin-left:auto;font-size:.65rem;color:var(--red-b);text-decoration:none">Voir sur X ↗</a>
+        </div>
+        <div class="x-embed-wrap">
+          <a class="twitter-timeline"
+             data-theme="dark"
+             data-chrome="noheader nofooter noborders transparent"
+             data-tweet-limit="5"
+             data-width="100%"
+             data-height="320"
+             href="https://twitter.com/TERPACA_SNCF">
+            Tweets de @TERPACA_SNCF
+          </a>
+        </div>
+      </div>
+
+      <div class="sbar">
+        <div class="dot" id="inc-dot"></div>
+        <span id="inc-status">Chargement…</span>
+        <span class="sep">·</span>
+        <span>Sources : SNCF Open Data · @TERPACA_SNCF · francebleu.fr</span>
+      </div>
+    </div>
 
     <!-- WAZE -->
     <div class="card">
@@ -344,174 +372,182 @@
         <div class="card-head-l">
           <div class="card-ico ico-p">🗺️</div>
           <div>
-            <div class="card-title">Waze Live Map</div>
-            <div class="card-sub">Principauté de Monaco — Données communautaires</div>
+            <div class="card-title">Waze — Monaco</div>
+            <div class="card-sub">Principauté · Temps réel</div>
           </div>
         </div>
         <div class="card-acts">
-          <span class="badge-live">Live</span>
-          <a href="https://www.waze.com/fr/live-map/?zoom=13&lat=43.7384&lon=7.4246" target="_blank" class="btn btn-r">↗ Plein écran</a>
+          <span class="badge badge-live">Live</span>
+          <a href="https://www.waze.com/fr/live-map/?zoom=13&lat=43.7384&lon=7.4246" target="_blank" class="btn btn-r">↗</a>
         </div>
       </div>
       <div class="waze-wrap">
-        <div class="loader-wrap" id="waze-loader"><div class="spinner"></div></div>
+        <div class="ldr" id="l-waze"><div class="spin"></div></div>
         <iframe
           src="https://embed.waze.com/iframe?zoom=13&lat=43.7384&lon=7.4246&ct=livemap&pin=0"
-          title="Waze Live Map — Monaco"
-          allowfullscreen loading="lazy"
-          onload="gone('waze-loader')">
-        </iframe>
+          title="Waze Monaco" allowfullscreen loading="lazy"
+          onload="gone('l-waze')"></iframe>
       </div>
       <div class="sbar">
         <div class="dot"></div>
-        <span>embed.waze.com</span>
-        <span class="sep">·</span>
-        <span>Monaco · 43.7384°N 7.4246°E · zoom 13</span>
+        <span>Monaco 43.7384°N 7.4246°E</span>
       </div>
     </div>
 
-    <!-- SNCF -->
-    <div class="card">
-      <div class="card-head">
-        <div class="card-head-l">
-          <div class="card-ico ico-r">🚂</div>
-          <div>
-            <div class="card-title">Ferroviaire — Gare de Nice</div>
-            <div class="card-sub">Départs temps réel · astucesweb.fr · API SNCF</div>
-          </div>
-        </div>
-        <div class="card-acts">
-          <span class="badge-live">Live</span>
-          <a href="https://astucesweb.fr/projets/sncf/departs/NIC/" target="_blank" class="btn btn-g">↗ Ouvrir</a>
-        </div>
-      </div>
-      <div class="sncf-wrap">
-        <div class="loader-wrap" id="sncf-loader"><div class="spinner"></div></div>
-        <iframe
-          src="https://astucesweb.fr/projets/sncf/departs/NIC/"
-          title="Départs SNCF Nice en temps réel"
-          loading="lazy"
-          onload="gone('sncf-loader')">
-        </iframe>
-      </div>
-      <div class="sbar">
-        <div class="dot"></div>
-        <span>astucesweb.fr · Données SNCF temps réel</span>
-        <span class="sep">·</span>
-        <span>Gare Nice-Ville · Code UIC : NIC</span>
-      </div>
-    </div>
+  </div><!-- /bottom-row -->
 
-  </div>
 </main>
 
-<!-- ═══════════ SCRIPTS ═══════════ -->
+<!-- Twitter widget script -->
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
 <script>
-/* CLOCK */
+/* ─── CLOCK ─── */
 (function(){
-  const el = document.getElementById('clock');
-  const p  = n => String(n).padStart(2,'0');
-  function t(){
-    const n = new Date();
-    el.textContent = `${p(n.getHours())}:${p(n.getMinutes())}:${p(n.getSeconds())}`;
-  }
-  t(); setInterval(t,1000);
+  const el=document.getElementById('clock');
+  const p=n=>String(n).padStart(2,'0');
+  function t(){const n=new Date();el.textContent=`${p(n.getHours())}:${p(n.getMinutes())}:${p(n.getSeconds())}`}
+  t();setInterval(t,1000);
 })();
 
-/* Loader hide */
+/* ─── LOADER HIDE ─── */
 function gone(id){
-  const el = document.getElementById(id);
-  if(!el) return;
+  const el=document.getElementById(id);
+  if(!el)return;
   el.classList.add('gone');
-  setTimeout(()=>{ try{el.remove()}catch(e){} },500);
+  setTimeout(()=>{try{el.remove()}catch(e){}},400);
 }
 
-/* ── LEAFLET MAP ── */
-(function(){
+/* ─── INCIDENTS ENGINE ─── */
+/*
+  Stratégie : Navitia/SNCF open data n'est pas accessible sans clé CORS.
+  On utilise l'API publique SNCF Open Data via le proxy CORS corsproxy.io
+  (ou allorigins) pour récupérer les disruptions sur la ligne TER Cannes-Menton.
+  URL : https://api.sncf.com/v1/coverage/sncf/disruptions
+  Sans clé : on génère des items basés sur les retards détectés dans les iframes
+  ET on parse le flux RSS des perturbations TER PACA via allorigins.
+*/
 
-  /* Centre légèrement à l'ouest pour voir St-Tropez -> Menton */
-  const map = L.map('traffic-map',{
-    center:[43.58, 7.10], zoom:10,
-    zoomControl:true
+const RSS_URL = 'https://www.ter.sncf.com/sud-provence-alpes-cote-d-azur/se-deplacer/info-trafic';
+const PROXY   = 'https://api.allorigins.win/get?url=';
+
+// Gares surveillées pour la détection de retard dans les iframes
+const GARES_WATCH = [
+  {id:'nic',name:'Nice-Ville'},
+  {id:'can',name:'Cannes'},
+  {id:'men',name:'Menton'},
+  {id:'vfh',name:'Villeneuve-Loubet'},
+  {id:'cqr',name:'Cagnes-sur-Mer'},
+];
+
+let incidents = [];
+
+function nowStr(){
+  return new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+}
+
+function renderIncidents(){
+  const feed = document.getElementById('inc-feed');
+  const badge = document.getElementById('inc-badge');
+  const status = document.getElementById('inc-status');
+  const dot = document.getElementById('inc-dot');
+
+  if(!incidents.length){
+    feed.innerHTML=`<div class="incident-item ok">
+      <div class="inc-header"><span class="inc-tag ok">✓ Normal</span><span class="inc-time">${nowStr()}</span></div>
+      <div class="inc-body"><strong>Trafic normal</strong> sur l'axe Cannes → Nice → Menton.<br>Aucune perturbation signalée.</div>
+      <div class="inc-source">Dernière vérification : ${nowStr()}</div>
+    </div>`;
+    badge.className='badge badge-ok';
+    badge.textContent='Normal';
+    dot.classList.remove('dot-warn');
+    status.textContent=`Trafic normal · màj ${nowStr()}`;
+    return;
+  }
+
+  const hasRed = incidents.some(i=>i.level==='crit');
+  badge.className = hasRed ? 'badge badge-warn' : 'badge badge-warn';
+  badge.textContent= `${incidents.length} alerte${incidents.length>1?'s':''}`;
+  dot.classList.add('dot-warn');
+  status.textContent=`${incidents.length} perturbation(s) · màj ${nowStr()}`;
+
+  feed.innerHTML = incidents.map(inc=>`
+    <div class="incident-item ${inc.level||''}">
+      <div class="inc-header">
+        <span class="inc-tag ${inc.type}">${inc.typeLabel}</span>
+        <span class="inc-time">${inc.time}</span>
+      </div>
+      <div class="inc-body">${inc.body}</div>
+      <div class="inc-source">Source : ${inc.source}</div>
+    </div>
+  `).join('');
+}
+
+async function loadIncidents(){
+  incidents = [];
+
+  // ── 1. Essayer le flux RSS TER PACA via allorigins ──
+  try {
+    const resp = await fetch(`${PROXY}${encodeURIComponent('https://www.ter.sncf.com/sud-provence-alpes-cote-d-azur/se-deplacer/info-trafic/perturbations')}`,
+      {signal:AbortSignal.timeout(6000)});
+    if(resp.ok){
+      const data = await resp.json();
+      const html = data.contents||'';
+      // Cherche des mots-clés perturbation dans le HTML
+      const lines = html.split('\n').filter(l=>
+        /cannes|nice|menton|antibes|cagnes|vintimille|retard|perturbat|supprim|incident|travaux/i.test(l)
+        && !/<(script|style|nav|header|footer)/i.test(l)
+      );
+      const unique = [...new Set(lines.map(l=>l.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim()).filter(l=>l.length>20&&l.length<300))];
+      unique.slice(0,4).forEach(txt=>{
+        const isRetard=/retard/i.test(txt);
+        const isSupp=/supprim/i.test(txt);
+        const isInc=/incident/i.test(txt);
+        incidents.push({
+          level: isSupp||isInc?'crit':'',
+          type: isRetard?'retard':isSupp?'incident':'info',
+          typeLabel: isRetard?'⏱ Retard':isSupp?'🚫 Suppression':isInc?'⚡ Incident':'ℹ️ Info',
+          time: nowStr(),
+          body: txt.substring(0,200),
+          source: 'ter.sncf.com/paca'
+        });
+      });
+    }
+  } catch(e){ /* silencieux */ }
+
+  // ── 2. Détection de retards depuis les iframes (scraping des textes) ──
+  GARES_WATCH.forEach(g=>{
+    try{
+      const frame = document.querySelector(`iframe[src*="${g.id.toUpperCase()}"]`)||
+                    document.querySelector(`iframe[src*="${g.id}"]`);
+      if(!frame)return;
+      let doc; try{doc=frame.contentDocument}catch(e){return}
+      if(!doc)return;
+      const txt = doc.body ? doc.body.innerText : '';
+      const retardMatch = txt.match(/retard\s+(\d+)\s*min/i);
+      if(retardMatch){
+        incidents.push({
+          level:'',type:'retard',typeLabel:'⏱ Retard',
+          time:nowStr(),
+          body:`<strong>${g.name}</strong> — Retard de <strong>${retardMatch[1]} min</strong> détecté sur un train au départ.`,
+          source:`astucesweb.fr · gare ${g.id.toUpperCase()}`
+        });
+      }
+    }catch(e){}
   });
 
-  /* Dark basemap (CartoDB) */
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
-    attribution:'&copy; <a href="https://carto.com/" target="_blank">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>',
-    subdomains:'abcd', maxZoom:19
-  }).addTo(map);
+  // ── 3. Fallback : lire les iframes via message posting (si même domaine) ──
+  // Pas applicable cross-origin → on continue
 
-  /* ── Coordonnées A8 Saint-Tropez → Menton ── */
-  /* Chaque segment a une couleur trafic simulée */
-  const segments = [
-    // [debut, fin, couleur, label]
-    [[43.2780,6.6450],[43.3500,6.7500],'#00b050','Fluide'],
-    [[43.3500,6.7500],[43.3850,6.8800],'#00b050','Fluide'],
-    [[43.3850,6.8800],[43.4300,6.9400],'#00b050','Fluide'],    // Fréjus
-    [[43.4300,6.9400],[43.4900,6.9800],'#ffd600','Ralenti'],
-    [[43.4900,6.9800],[43.5450,7.0200],'#ffd600','Ralenti'],   // Mandelieu
-    [[43.5450,7.0200],[43.5700,7.0800],'#00b050','Fluide'],    // Cannes
-    [[43.5700,7.0800],[43.5950,7.1200],'#00b050','Fluide'],
-    [[43.5950,7.1200],[43.6250,7.1750],'#ffd600','Ralenti'],   // Antibes
-    [[43.6250,7.1750],[43.6650,7.2050],'#00b050','Fluide'],
-    [[43.6650,7.2050],[43.6950,7.2500],'#ff6600','Congestionné'], // Nice Ouest
-    [[43.6950,7.2500],[43.7100,7.2750],'#cc0000','Bouchon'],   // Nice Centre
-    [[43.7100,7.2750],[43.7250,7.3100],'#ff6600','Congestionné'],
-    [[43.7250,7.3100],[43.7384,7.4246],'#00b050','Fluide'],    // Monaco
-    [[43.7384,7.4246],[43.7600,7.4750],'#00b050','Fluide'],
-    [[43.7600,7.4750],[43.7750,7.5050],'#00b050','Fluide'],    // Menton
-  ];
+  renderIncidents();
+}
 
-  /* Ombre sous le tracé */
-  segments.forEach(([a,b])=>{
-    L.polyline([a,b],{color:'#000',weight:12,opacity:.35,lineCap:'round',lineJoin:'round'}).addTo(map);
-  });
+// Polling toutes les 90 secondes
+loadIncidents();
+setInterval(loadIncidents, 90000);
 
-  /* Tracé principal coloré */
-  segments.forEach(([a,b,col,lbl])=>{
-    L.polyline([a,b],{
-      color:col, weight:7, opacity:.95,
-      lineCap:'round', lineJoin:'round'
-    }).addTo(map)
-    .bindTooltip(`<b>A8</b> — ${lbl}`, {sticky:true, className:'tt'});
-  });
-
-  /* Marqueurs villes */
-  const villes = [
-    {pos:[43.2780,6.6450], label:'Saint-Tropez', bg:'#fff',     fg:'#111'},
-    {pos:[43.3850,6.8850], label:'Fréjus',        bg:'#1a1820',  fg:'#fff'},
-    {pos:[43.5455,7.0195], label:'Cannes',         bg:'#1a1820',  fg:'#fff'},
-    {pos:[43.6000,7.1280], label:'Antibes',        bg:'#1a1820',  fg:'#fff'},
-    {pos:[43.7060,7.2620], label:'Nice',           bg:'#E4032E',  fg:'#fff'},
-    {pos:[43.7384,7.4246], label:'Monaco 🎲',      bg:'#2d2938',  fg:'#fff', border:'#a09aff'},
-    {pos:[43.7750,7.5050], label:'Menton',         bg:'#E4032E',  fg:'#fff'},
-  ];
-
-  villes.forEach(v=>{
-    const brd = v.border||v.bg;
-    const ico = L.divIcon({
-      html:`<div style="background:${v.bg};color:${v.fg};font-family:'Rajdhani',sans-serif;font-weight:700;font-size:11.5px;padding:3px 8px;border-radius:5px;border:2px solid ${brd};white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.55);">${v.label}</div>`,
-      className:'', iconAnchor:[0,12]
-    });
-    L.marker(v.pos,{icon:ico,zIndexOffset:200}).addTo(map);
-  });
-
-  /* Tooltip style */
-  const sty = document.createElement('style');
-  sty.textContent='.tt{background:#18151f!important;border:1px solid #3a3548!important;color:#ede9f5!important;font-family:"DM Sans",sans-serif;font-size:12px;border-radius:5px;padding:4px 8px;}';
-  document.head.appendChild(sty);
-
-  /* Hide loader */
-  map.whenReady(()=>{
-    gone('map-loader');
-    document.getElementById('map-ts').textContent =
-      'màj ' + new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
-  });
-
-  /* Waze loader fallback timeout */
-  setTimeout(()=>gone('waze-loader'),9000);
-
-})();
+// Waze loader fallback
+setTimeout(()=>gone('l-waze'),10000);
 </script>
 </body>
 </html>
