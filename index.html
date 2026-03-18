@@ -148,8 +148,14 @@ main{padding:12px 12px 32px;display:flex;flex-direction:column;gap:12px}
   75%{background:rgba(228,3,46,.1);box-shadow:0 0 8px rgba(228,3,46,.25)}
 }
 .inc-item.flashing{
-  animation:flash-red 1s ease-in-out 6; /* 6 cycles ≈ 1 min avec délai géré en JS */
+  animation:flash-red 1s ease-in-out infinite;
   border-left-color:var(--red)!important;
+  cursor:pointer;
+}
+.inc-item.flashing::after{
+  content:'👆 Cliquer pour acquitter';
+  display:block;font-size:.58rem;color:var(--red);
+  margin-top:4px;letter-spacing:.06em;opacity:.7;
 }
 
 .inc-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px}
@@ -361,7 +367,7 @@ main{padding:12px 12px 32px;display:flex;flex-direction:column;gap:12px}
             ↺ Actu
           </button>
           <a href="https://www.ter.sncf.com/sud-provence-alpes-cote-d-azur/se-deplacer/info-trafic" target="_blank" class="btn btn-g">TER PACA ↗</a>
-          <a href="https://x.com/TERPACA_SNCF" target="_blank" class="btn btn-g">@TERPACA ↗</a>
+          <a href="https://x.com/deruellehugo" target="_blank" class="btn btn-g">@deruellehugo ↗</a>
           <div class="chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
         </div>
       </div>
@@ -380,8 +386,8 @@ main{padding:12px 12px 32px;display:flex;flex-direction:column;gap:12px}
         <div class="x-wrap">
           <div class="x-label">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.738l7.731-8.835L1.254 2.25H8.08l4.261 5.635 5.903-5.635zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-            @TERPACA_SNCF — Info trafic officiel
-            <a href="https://x.com/TERPACA_SNCF" target="_blank">Voir sur X ↗</a>
+            @deruellehugo — Info trafic
+            <a href="https://x.com/deruellehugo" target="_blank">Voir sur X ↗</a>
           </div>
           <div style="background:var(--s2);overflow:hidden">
             <a class="twitter-timeline"
@@ -390,7 +396,7 @@ main{padding:12px 12px 32px;display:flex;flex-direction:column;gap:12px}
                data-tweet-limit="4"
                data-width="100%"
                data-height="280"
-               href="https://twitter.com/TERPACA_SNCF">
+               href="https://twitter.com/deruellehugo">
             </a>
           </div>
         </div>
@@ -469,30 +475,24 @@ let flashTimers = {};           // timers de flash par ID
 
 function nowStr(){return new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}
 
-function flashItem(el, durationMs){
-  el.classList.add('flashing');
-  const tid = setTimeout(()=>el.classList.remove('flashing'), durationMs);
-  return tid;
-}
-
-/* Lance le flash 1 min sur un item */
+/* Flash infini — s'arrête uniquement au clic (acquittement) */
 function startFlash(itemEl){
-  // CSS animation flash-red dure 1s × 6 cycles = 6s
-  // On la relance toutes les 6s pendant 1 min (10 fois)
   itemEl.classList.add('flashing');
-  let count=0;
-  const interval=setInterval(()=>{
-    count++;
-    if(count>=10){
-      clearInterval(interval);
-      itemEl.classList.remove('flashing');
-      return;
-    }
-    // force reflow to restart animation
+  function dismiss(){
     itemEl.classList.remove('flashing');
-    void itemEl.offsetWidth;
-    itemEl.classList.add('flashing');
-  },6000);
+    itemEl.removeEventListener('click', dismiss);
+    // Si plus aucun item ne clignote, reset badge
+    if(!document.querySelector('.inc-item.flashing')){
+      const badge=document.getElementById('inc-badge');
+      const hasAlerts=document.querySelectorAll('.inc-item:not(.ok)').length>0;
+      if(!hasAlerts){
+        badge.className='badge badge-ok';
+        badge.textContent='Normal';
+        document.getElementById('inc-dot').classList.remove('dot-warn');
+      }
+    }
+  }
+  itemEl.addEventListener('click', dismiss);
 }
 
 /* Bouton TEST */
@@ -506,27 +506,17 @@ function testFlash(e){
       <span class="inc-tag incident">⚡ TEST — Incident simulé</span>
       <span class="inc-time">${nowStr()}</span>
     </div>
-    <div class="inc-text"><strong>ALERTE TEST</strong> — Ceci est un test du système de clignotement.<br>La case clignote en rouge pendant <strong>1 minute</strong>.</div>
+    <div class="inc-text"><strong>ALERTE TEST</strong> — Ceci est un test du système de clignotement.<br>Cliquez sur cette carte pour acquitter et arrêter le clignotement.</div>
     <div class="inc-src">Bouton de test manuel · ${nowStr()}</div>
   `;
   feed.prepend(testItem);
   startFlash(testItem);
 
-  // Badge warn
   const badge=document.getElementById('inc-badge');
   badge.className='badge badge-warn';
   badge.textContent='TEST alerte';
   document.getElementById('inc-dot').classList.add('dot-warn');
-
-  // Ouvre la section si fermée
   document.getElementById('sec-inc').classList.remove('collapsed');
-
-  // Reset badge après 1 min
-  setTimeout(()=>{
-    badge.className='badge badge-ok';
-    badge.textContent='Normal';
-    document.getElementById('inc-dot').classList.remove('dot-warn');
-  },61000);
 }
 
 /* Render liste incidents */
