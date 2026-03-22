@@ -427,6 +427,8 @@ function _paintAllMonVU(){
 
 const SIG_URL='https://radio-signaling.nicolas7lejeune.workers.dev';
 let _rcOnline=false;
+let _rcPlaying=false;
+let _rcTrack='';
 function _rcSetStatus(online){
   const dot=document.getElementById('rc-status-dot');
   const lbl=document.getElementById('rc-status-lbl');
@@ -493,6 +495,14 @@ function sigHandleMessage(msg){
   }
 }
 
+
+// ── Macro RACCRO REGIO ──
+function runRaccroRegio(){
+  sigSend({action:'raccro-ext',source:'D3'});
+  const btn=document.getElementById('raccro-regio-btn');
+  if(btn){btn.style.borderColor='#66bb6a';btn.style.color='#66bb6a';
+    setTimeout(()=>{btn.style.borderColor='#455a64';btn.style.color='#78909c';},1500);}
+}
 function initSignaling(){sigSend({action:'ready',source:'D3'});_sh();_startPolling();}
 
 // ═══════════════════════════════════════════════════════
@@ -531,6 +541,18 @@ function drawWaveformFromData(canvas,data,startRatio=0,endRatio=1){
 // ═══════════════════════════════════════════════════════
 // CLASSE DIFFUSER (identique à diff2)
 // ═══════════════════════════════════════════════════════
+
+// ── Voyants ON AIR diff3 ──
+function _updateOnAirBadgesD3(){
+  const ids=['marseille','nice','strasbourg','lyon','bordeaux','toulouse','lille','nantes'];
+  VILLES.forEach((v,i)=>{
+    const on=D[i]&&D[i].playing;
+    const b=document.getElementById('badge-'+v.id);
+    const bs=document.getElementById('badge-'+v.id+'-state');
+    if(b)b.className='onair-badge '+(on?'on-air':'off-air');
+    if(bs)bs.textContent=on?'ON AIR':'OFF AIR';
+  });
+}
 class Diffuser{
   constructor(cfg,idx){
     this.cfg=cfg;this.idx=idx;this.ids=cfg.ids;
