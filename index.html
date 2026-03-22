@@ -1015,12 +1015,7 @@ let _consecutiveErrors=0;
 const _POLL_FAST=500,_POLL_SLOW=3000;
 let _currentPollInterval=_POLL_FAST;
 let _pollIntervalId=null,_hbIntervalId=null;
-function _startPolling(){
-  if(_pollIntervalId)clearInterval(_pollIntervalId);
-  if(_hbIntervalId)clearInterval(_hbIntervalId);
-  _pollIntervalId=setInterval(_safePoll,_currentPollInterval);
-  _hbIntervalId=setInterval(_safeHeartbeat,5000);
-}
+
 async function _safePoll(){
   try{await sigPoll();if(_consecutiveErrors>0){_consecutiveErrors=0;if(_currentPollInterval!==_POLL_FAST){_currentPollInterval=_POLL_FAST;_startPolling();}}}
   catch(e){_consecutiveErrors++;if(_consecutiveErrors>=3&&_currentPollInterval!==_POLL_SLOW){_currentPollInterval=_POLL_SLOW;_startPolling();}}
