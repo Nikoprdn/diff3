@@ -174,6 +174,17 @@
 <!-- Les 6 cards sont générées en JS -->
 </div>
 
+<!-- Panneau monitoring audio : sélecteur solo + VU par ville -->
+<div class="card is-dark-card" style="border-radius:6px">
+  <div style="background:var(--s2);border-bottom:1px solid var(--border);padding:6px 14px;display:flex;align-items:center;justify-content:space-between">
+    <span style="font-family:var(--display);font-size:12px;font-weight:700;color:var(--txt);letter-spacing:2px">MONITORING</span>
+    <span style="font-family:var(--mono);font-size:8px;color:var(--txt-mute);letter-spacing:2px">ÉCOUTE SOLO</span>
+  </div>
+  <div style="padding:10px 14px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px" id="monitoring-grid">
+    <!-- généré en JS -->
+  </div>
+</div>
+
 <!-- Encart RC + voyants -->
 <div class="card is-dark-card" style="border-radius:6px">
   <div class="rc-now-playing">
@@ -325,6 +336,95 @@ function buildCards(){
 // ═══════════════════════════════════════════════════════
 // SIGNALING
 // ═══════════════════════════════════════════════════════
+// ── Monitoring solo ──
+let _soloIdx = -1; // -1 = tout le monde en sourdine (mode monitoring)
+
+function buildMonitoringGrid(){
+  const grid = document.getElementById('monitoring-grid');
+  if(!grid) return;
+  grid.innerHTML = VILLES.map((v,i) => `
+    <div style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:8px 6px;border-radius:6px;border:1px solid #1e2a40;background:#0a0e18;cursor:pointer;transition:all .2s;user-select:none"
+         id="mon-cell-${i}" onclick="setSolo(${i})">
+      <div style="font-family:var(--mono);font-size:8px;font-weight:700;color:#2a3a50;letter-spacing:1px;text-align:center" id="mon-lbl-${i}">${v.label}</div>
+      <!-- Mini VU canvas -->
+      <canvas id="mon-vu-${i}" width="32" height="40" style="border-radius:3px;background:#0d0f12;display:block"></canvas>
+      <!-- Indicateur solo -->
+      <div style="font-family:var(--mono);font-size:7px;letter-spacing:2px;color:#1e2a40;transition:all .2s" id="mon-state-${i}">OFF</div>
+    </div>`).join('');
+}
+
+function setSolo(idx){
+  if(_soloIdx === idx){
+    // Désactiver le solo
+    _soloIdx = -1;
+  } else {
+    _soloIdx = idx;
+  }
+  _applySoloGains();
+  _updateMonitoringUI();
+}
+
+function _applySoloGains(){
+  VILLES.forEach((_,i)=>{
+    if(!_masterGnsD3[i]) return;
+    if(_soloIdx === -1){
+      // Tout en sourdine (monitoring)
+      _masterGnsD3[i].gain.value = 0;
+    } else if(i === _soloIdx){
+      _masterGnsD3[i].gain.value = 1;
+    } else {
+      _masterGnsD3[i].gain.value = 0;
+    }
+  });
+}
+
+function _updateMonitoringUI(){
+  VILLES.forEach((_,i)=>{
+    const cell = document.getElementById(`mon-cell-${i}`);
+    const lbl  = document.getElementById(`mon-lbl-${i}`);
+    const state= document.getElementById(`mon-state-${i}`);
+    const isSolo = (_soloIdx === i);
+    const isOn = D[i] && D[i].playing;
+    if(cell){
+      cell.style.borderColor = isSolo ? '#66bb6a' : isOn ? '#cc0000' : '#1e2a40';
+      cell.style.background  = isSolo ? '#071408' : isOn ? '#1a0000' : '#0a0e18';
+    }
+    if(lbl)  lbl.style.color = isSolo ? '#66bb6a' : isOn ? '#ff4040' : '#2a3a50';
+    if(state){ state.textContent = isSolo ? '● SOLO' : isOn ? 'ON AIR' : 'OFF'; state.style.color = isSolo ? '#66bb6a' : isOn ? '#ff4040' : '#1e2a40'; }
+  });
+}
+
+// Peindre les mini VU dans le panneau monitoring
+function _paintAllMonVU(){
+  VILLES.forEach((_,i)=>{
+    const cv = document.getElementById(`mon-vu-${i}`);
+    if(!cv) return;
+    const ctx = cv.getContext('2d');
+    const W=cv.width, H=cv.height;
+    ctx.fillStyle='#0d0f12'; ctx.fillRect(0,0,W,H);
+    if(!_vuD3[i]){
+      // Pas de signal : barres grises
+      for(let b=0;b<8;b++){
+        ctx.fillStyle='#1a1c22';
+        ctx.fillRect(3,H-4-(b*5),W-6,3);
+      }
+      return;
+    }
+    const data=new Float32Array(_vuD3[i].aL.fftSize);
+    _vuD3[i].aL.getFloatTimeDomainData(data);
+    let s=0; for(const v of data) s+=v*v;
+    const rms=Math.sqrt(s/data.length);
+    const db=rms>0?Math.max(-48,20*Math.log10(rms)):-48;
+    const active=Math.round(((db+48)/48)*8);
+    for(let b=0;b<8;b++){
+      const lit=b<active;
+      const color = b>=6 ? '#ef5350' : b>=4 ? '#ffa726' : '#66bb6a';
+      ctx.fillStyle = lit ? color : '#1a1c22';
+      ctx.fillRect(3, H-4-(b*5), W-6, 3);
+    }
+  });
+}
+
 const SIG_URL='https://radio-signaling.nicolas7lejeune.workers.dev';
 let _rcOnline=false,_rcPlaying=false,_rcTrack='';
 
@@ -782,7 +882,9 @@ function _wireAudioD3(el,idx){
   if(!el||el._wiredD3)return;el._wiredD3=true;
   const ctx=getCtxD3();
   if(!_masterGnsD3[idx]){
-    const gn=ctx.createGain();gn.gain.value=1;
+    const gn=ctx.createGain();
+    // Appliquer le gain selon le solo actuel
+    gn.gain.value=(_soloIdx===-1)?0:(_soloIdx===idx?1:0);
     const sp=ctx.createChannelSplitter(2);
     const aL=ctx.createAnalyser(),aR=ctx.createAnalyser();
     aL.fftSize=1024;aR.fftSize=1024;aL.smoothingTimeConstant=0.8;aR.smoothingTimeConstant=0.8;
@@ -857,6 +959,8 @@ function _bindHandlesD3(wvId,diffIdx,trackIdx){
 function mainLoop(){
   requestAnimationFrame(mainLoop);
   D.forEach(d=>d.tick());
+  _paintAllMonVU();
+  _updateMonitoringUI();
   const sec=new Date().getSeconds();
   if(sec!==_lastClockSec){
     _lastClockSec=sec;
@@ -987,8 +1091,10 @@ D[0].togglePlay = _mirrorTogglePlay;
 
 function _onReady(){
   D.forEach(d=>d.render());
+  buildMonitoringGrid();
   mainLoop();
   initSignaling();
+  _applySoloGains(); // gains initiaux (tout muet)
   // Rebrancher les boutons miroir après render
   setTimeout(()=>{
     document.querySelectorAll('[onclick="D[0].togglePlay()"]').forEach(btn=>{
