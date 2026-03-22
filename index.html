@@ -464,6 +464,35 @@ async function _sh(){try{await sigHeartbeat();_ce=Math.max(0,_ce-1);}catch(e){_c
 document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible'){_ce=0;_pi=500;_sh();_sp();_startPolling();}});
 window.addEventListener('online',function(){_ce=0;_sh();_sp();_startPolling();});
 window.addEventListener('offline',function(){if(_pid)clearInterval(_pid);if(_hid)clearInterval(_hid);});
+
+function sigHandleMessage(msg){
+  if(!msg||!msg.action)return;
+  _rcSetStatus(true);
+  switch(msg.action){
+    case 'play-all':
+      startAllDiffuseurs();break;
+    case 'stop-all':
+      D.forEach(d=>{if(d.playing)d.stopAll();});break;
+    case 'play-city':
+      if(typeof msg.idx==='number'&&D[msg.idx]&&!D[msg.idx].playing)D[msg.idx].togglePlay();break;
+    case 'rc-status':
+      _rcPlaying=!!msg.playing;_rcTrack=msg.track||'';
+      _updateRcDisplay();break;
+    case 'status':
+      _rcPlaying=!!msg.playing;_rcTrack=msg.track||'';
+      _updateRcDisplay();break;
+    case 'd2-pong':case 'pong':
+      _rcSetStatus(true);break;
+    case 'raccro-ext':
+      const btn2=document.getElementById('raccro-regio-btn');
+      if(btn2){btn2.style.borderColor='#66bb6a';btn2.style.color='#66bb6a';
+        setTimeout(()=>{btn2.style.borderColor='#455a64';btn2.style.color='#78909c';},2000);}
+      break;
+    default:
+      if(msg.action==='ping'||msg.action==='d3-ping')sigSend({action:'pong',source:'D3'});
+  }
+}
+
 function initSignaling(){sigSend({action:'ready',source:'D3'});_sh();_startPolling();}
 
 // ═══════════════════════════════════════════════════════
@@ -775,6 +804,12 @@ class Diffuser{
 let _audioCtxD3=null;
 function getCtxD3(){if(!_audioCtxD3)_audioCtxD3=new(window.AudioContext||window.webkitAudioContext)();if(_audioCtxD3.state==='suspended')_audioCtxD3.resume();return _audioCtxD3;}
 const _masterGnsD3=[];const _vuD3=[];
+
+function getCtx(){
+  if(!_audioCtxD3)_audioCtxD3=new(window.AudioContext||window.webkitAudioContext)();
+  if(_audioCtxD3.state==='suspended')_audioCtxD3.resume();
+  return _audioCtxD3;
+}
 function _wireAudioD3(el,idx){
   if(!el||el._wiredD3)return;el._wiredD3=true;
   const ctx=getCtxD3();
