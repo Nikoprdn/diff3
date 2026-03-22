@@ -154,6 +154,7 @@
       </div>
       <!-- START ALL -->
       <button class="start-all-btn" id="start-all-btn" onclick="startAllDiffuseurs()">⚡ START ALL</button>
+      <button class="start-all-btn" id="raccro-regio-btn" onclick="runRaccroRegio()" style="border-color:#455a64;color:#78909c" title="Lance le Diff A de Radio Console">⚡ RACCRO RC</button>
       <div class="clock-display" id="clock">--:--:--</div>
     </div>
   </div>
@@ -307,6 +308,18 @@ function buildCards(){
       <span class="onair-state" id="badge-${v.id}-state">OFF AIR</span>`;
     badges.appendChild(badge);
   });
+
+  // Badge MIROIR sur les diffuseurs 1..7
+  VILLES.forEach((v,i)=>{
+    if(i===0) return;
+    const bar=document.querySelector(`#card-${v.id} .notification`);
+    if(bar){
+      const m=document.createElement('span');
+      m.style.cssText='font-family:var(--mono);font-size:7px;color:#37474f;background:#151719;border:1px solid #2e3238;border-radius:2px;padding:1px 6px;letter-spacing:2px;margin-left:6px;';
+      m.textContent='MIROIR';
+      bar.querySelector('.button')?.parentElement?.insertBefore(m, bar.querySelector('.button'));
+    }
+  });
 }
 
 // ═══════════════════════════════════════════════════════
@@ -375,7 +388,13 @@ function sigHandleMessage(msg){
       break;
     case 'rc-status':
       _rcPlaying=!!msg.playing;_rcTrack=msg.track||'';
-      _updateRcDisplay();break;
+      _updateRcDisplay();_updateOnAirBadgesD3();break;
+    case 'raccro-ext':
+      // RC confirme le raccro — signal visuel
+      const btn2=document.getElementById('raccro-regio-btn');
+      if(btn2){btn2.style.borderColor='#66bb6a';btn2.style.color='#66bb6a';
+        setTimeout(()=>{btn2.style.borderColor='#455a64';btn2.style.color='#78909c';},2000);}
+      break;
     case 'status':
       _rcPlaying=!!msg.playing;_rcTrack=msg.track||'';
       _updateRcDisplay();break;
@@ -409,6 +428,33 @@ function _updateOnAirBadgesD3(){
     const bs=document.getElementById(`badge-${v.id}-state`);
     if(b)b.className='onair-badge '+(on?'on-air':'off-air');
     if(bs)bs.textContent=on?'ON AIR':'OFF AIR';
+  });
+}
+
+function runRaccroRegio(){
+  // Envoyer raccro-ext à RC pour lancer le Diff A
+  sigSend({action:'raccro-ext',source:'D3'});
+  const btn=document.getElementById('raccro-regio-btn');
+  if(btn){
+    const prev=btn.style.borderColor;
+    btn.style.borderColor='#66bb6a'; btn.style.color='#66bb6a';
+    setTimeout(()=>{btn.style.borderColor='#455a64'; btn.style.color='#78909c';},1500);
+  }
+  // Aussi insérer un pas macro sur D[0] pour feedback visuel
+  const macroStep={
+    isMacro:true, title:'RACCRO RC', color:'#1a3a1a', inCue:0, outCue:null,
+    action:(diffuser)=>{
+      sigSend({action:'raccro-ext',source:'D3'});
+    }
+  };
+  D[0].tracks.push(macroStep); D[0].durs.push(0); D[0].audios.push(null);
+  D[0]._updateFdzCount(); D[0].render();
+  // Répliquer le macro sur les autres
+  D.forEach((d,i)=>{
+    if(i===0) return;
+    const ms2={...macroStep};
+    d.tracks.push(ms2); d.durs.push(0); d.audios.push(null);
+    d._updateFdzCount(); d.render();
   });
 }
 
@@ -820,16 +866,126 @@ function mainLoop(){
 buildCards();
 const D=CONFIGS.map((cfg,i)=>new Diffuser(cfg,i));
 
-// Resume AudioContext au premier play
-D.forEach((d,i)=>{
-  const orig=d.togglePlay.bind(d);
-  d.togglePlay=function(){getCtxD3().resume();orig();};
+// ── Mode miroir : Marseille (D[0]) pilote tous les autres ──
+// Chaque action sur D[0] est répliquée sur D[1..7]
+
+function _mirrorTogglePlay(){
+  getCtxD3().resume();
+  const wasPlaying = D[0].playing;
+  // Lancer D[0]
+  const origPlay = Diffuser.prototype.togglePlay.bind(D[0]);
+  origPlay();
+  // Répliquer sur D[1..7] si D[0] démarre
+  setTimeout(()=>{
+    if(D[0].playing !== wasPlaying){
+      D.forEach((d,i)=>{
+        if(i===0) return;
+        if(D[0].playing && !d.playing && d.tracks.some(t=>!t.isMacro)){
+          d.playing=true; d.ci=0; d._chainDone.clear();
+          d.tracks.forEach(t2=>{t2._launching=false;});
+          d._startTrack(0); d.render();
+        } else if(!D[0].playing && d.playing){
+          d._playToken++;
+          if(d._outTimer){cancelAnimationFrame(d._outTimer);clearTimeout(d._outTimer);d._outTimer=null;}
+          if(d._removeTimer){clearTimeout(d._removeTimer);d._removeTimer=null;}
+          d.audios.forEach(a=>{if(a){a.onended=null;if(!a.paused)a.pause();}});
+          d.tracks.forEach(t2=>{t2._launching=false;});
+          d.playing=false; d.render();
+        }
+      });
+    }
+  }, 50);
+}
+
+function _mirrorStopAll(){
+  D[0].stopAll();
+  D.forEach((d,i)=>{ if(i>0) d.stopAll(); });
+}
+
+function _mirrorToggleAuto(){
+  D[0].toggleAuto();
+  D.forEach((d,i)=>{
+    if(i===0) return;
+    d.auto = D[0].auto;
+    const btn=document.getElementById(d.cfg.autoBtn);
+    if(btn) btn.classList.toggle('active', d.auto);
+  });
+}
+
+// Surcharger les contrôles de Marseille (D[0]) dans le DOM
+// Les boutons onclick appellent D[0].togglePlay() — on les remplace
+document.querySelectorAll('[onclick="D[0].togglePlay()"]').forEach(btn=>{
+  btn.setAttribute('onclick','_mirrorTogglePlay()');
 });
+document.querySelectorAll('[onclick="D[0].stopAll()"]').forEach(btn=>{
+  btn.setAttribute('onclick','_mirrorStopAll()');
+});
+document.querySelectorAll('[onclick="D[0].toggleAuto()"]').forEach(btn=>{
+  btn.setAttribute('onclick','_mirrorToggleAuto()');
+});
+
+// Patch addTracks de D[0] pour répliquer les fichiers chargés sur Marseille
+const _origAddTracks = D[0].addTracks.bind(D[0]);
+D[0].addTracks = function(newTracks){
+  _origAddTracks(newTracks);
+  // Répliquer les mêmes pistes sur D[1..7]
+  // On recrée les tracks avec les mêmes fichiers (blob URLs partagées)
+  D.forEach((d,i)=>{
+    if(i===0) return;
+    const cloned = newTracks.map(t=>({...t, inCue:t.inCue||0, outCue:t.outCue||null}));
+    // Réutiliser le même blob URL (fichier déjà en mémoire)
+    const at=d._insertionIndex();
+    d.tracks.splice(at,0,...cloned);
+    d.durs.splice(at,0,...cloned.map(()=>0));
+    d.audios.splice(at,0,...cloned.map(()=>null));
+    cloned.forEach((ct,ni)=>{
+      const idx=at+ni;
+      const a=new Audio(); a.src=ct.file;
+      a.addEventListener('loadedmetadata',()=>{
+        const ri=d.tracks.indexOf(ct);if(ri===-1)return;
+        d.durs[ri]=a.duration||0;
+        if(d.tracks[ri]&&(d.tracks[ri].outCue===null||d.tracks[ri].outCue===undefined)) d.tracks[ri].outCue=a.duration;
+        d.render();
+        const cv=document.getElementById(`wv-d3-${i}-${ri}`);
+        if(cv){cv.width=400;cv.height=36;if(WV_DATA_CACHE[ct.file])drawWaveformFromData(cv,WV_DATA_CACHE[ct.file],0,1);else drawWaveform(cv,ct.file);}
+      });
+      d.audios[idx]=a;
+    });
+    d._updateFdzCount(); d.render();
+  });
+};
+
+// Indicateur visuel : badge "PILOTE" sur Marseille
+(()=>{
+  const hdr=document.getElementById('diff-header-0');
+  if(hdr){
+    const badge=document.createElement('div');
+    badge.style.cssText='padding:0 10px;display:flex;align-items:center;';
+    badge.innerHTML='<span style="font-family:var(--mono);font-size:8px;color:#ffa726;background:#1a1200;border:1px solid #6a4800;border-radius:3px;padding:2px 8px;letter-spacing:2px">PILOTE</span>';
+    hdr.querySelector('.notification')?.appendChild(badge);
+  }
+})();
+
+// Resume AudioContext au premier play
+const _origD0Play = D[0].togglePlay.bind(D[0]);
+D[0].togglePlay = _mirrorTogglePlay;
 
 function _onReady(){
   D.forEach(d=>d.render());
   mainLoop();
   initSignaling();
+  // Rebrancher les boutons miroir après render
+  setTimeout(()=>{
+    document.querySelectorAll('[onclick="D[0].togglePlay()"]').forEach(btn=>{
+      btn.setAttribute('onclick','_mirrorTogglePlay()');
+    });
+    document.querySelectorAll('[onclick="D[0].stopAll()"]').forEach(btn=>{
+      btn.setAttribute('onclick','_mirrorStopAll()');
+    });
+    document.querySelectorAll('[onclick="D[0].toggleAuto()"]').forEach(btn=>{
+      btn.setAttribute('onclick','_mirrorToggleAuto()');
+    });
+  },100);
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',_onReady);
 else _onReady();
