@@ -636,11 +636,15 @@ class Diffuser{
     const card=document.getElementById(`card-${VILLES[this.idx].id}`);
     if(card)card.classList.toggle('diff-is-live',this.playing);
     _updateOnAirBadgesD3();
-    // Notifier RC
+    // Notifier RC avec l'état individuel de CE diffuseur
     const activeTitle=anyAudioPlaying?this.tracks.find((t2,j)=>!t2.isMacro&&this.audios[j]&&(!this.audios[j].paused||t2._launching))?.title||'':'';
-    const anyOn=D.some(d=>d.playing);
-    const ns=anyOn+'|'+activeTitle;
-    if(ns!==this._lastSentState){this._lastSentState=ns;sigSend({action:'d3-status',playing:anyOn,city:VILLES[this.idx].label,track:activeTitle});}
+    const ns=this.playing+'|'+activeTitle;
+    if(ns!==this._lastSentState){
+      this._lastSentState=ns;
+      if(typeof sigSend==='function'){
+        sigSend({action:'d3-status',playing:this.playing,city:VILLES[this.idx].label,track:activeTitle});
+      }
+    }
   }
 
   tick(){
