@@ -3163,38 +3163,11 @@ D[0].togglePlay=function(){
 };
 
 
-function paintMix(id, sources){
-  const active=sources.filter(v=>v!=null);
-  if(!active.length){
-    ['L','R'].forEach(ch=>{document.querySelectorAll(`#vu-${id}-${ch} .vu-row`).forEach(r=>r.style.opacity='0.1');});
-    const el=document.getElementById(`vu-${id}-db`);
-    if(el){el.textContent='—∞';el.style.color='#00d4f0';}
-    return -60;
-  }
-  let rL=0,rR=0;
-  active.forEach(v=>{rL+=getRMS(v.aL);rR+=getRMS(v.aR);});
-  rL=Math.min(1,rL); rR=Math.min(1,rR);
-  [{id:`vu-${id}-L`,rms:rL},{id:`vu-${id}-R`,rms:rR}].forEach(({id:bid,rms})=>{
-    const db=rms>0?Math.max(-60,20*Math.log10(rms)):-60;
-    const act=Math.round(((db+60)/60)*NUM_BARS);
-    document.querySelectorAll(`#${bid} .vu-row`).forEach((r,i)=>r.style.opacity=i<act?'1':'0.1');
-  });
-  const rms=Math.max(rL,rR);
-  const db=rms>0?Math.max(-60,20*Math.log10(rms)):-60;
-  const el=document.getElementById(`vu-${id}-db`);
-  if(el){el.textContent=db>-60?db.toFixed(1):'—∞';el.style.color=db>-3?'#e03020':db>-10?'#f5c400':'#00d4f0';}
-  return db;
+function vuLoop(){
+  requestAnimationFrame(vuLoop);
+  if(vu1) paintBars('vu1-L','vu1-R', vu1.aL, vu1.aR, 'vu1-db', vu1.gn, '#00d4f0');
 }
-
 vuLoop();
-
-// Init UI bouton écoute par défaut (SAT)
-(function(){
-  ['mix','sat','dab','hz'].forEach(k=>{
-    const btn=document.getElementById('listen-'+k);
-    if(btn) btn.classList.toggle('active', k===listenMode);
-  });
-})();
 
 
 setInterval(()=>{D.forEach(d=>d.tick());rdvTick();pazTick();},80);
