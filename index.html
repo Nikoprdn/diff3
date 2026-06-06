@@ -3140,6 +3140,7 @@ function registerVUGain(){}
 
 
 // ── DIFF 1 — source unique → VU sticky ──
+const _t0_orig=D[0].togglePlay.bind(D[0]);
 D[0].togglePlay=function(){
   const el=D[0].audios[D[0].ci]; if(!el){getCtx().resume();return _t0_orig();}
   getCtx().resume();
