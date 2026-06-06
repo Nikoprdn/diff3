@@ -1895,7 +1895,7 @@ class Diffuser{
     const ar=document.querySelector(`#${this.ids.body} tr.row-active`);
     if(ar) ar.style.setProperty('--prog',prog.toFixed(4));
     const pb=document.getElementById(this.ids.progress);
-    if(pb) pb.value=Math.round(prog*100);    document.getElementById(this.ids.micros).textContent = fmtSec(pos-inCue);
+    if(pb) pb.value=Math.round(prog*100);    const micEl=document.getElementById(this.ids.micros); if(micEl) micEl.textContent = fmtSec(pos-inCue);
   }
 
   // ──────────────────────────────────────────────────────────────
@@ -1949,7 +1949,10 @@ class Diffuser{
     };
 
     // ── Lancer la lecture ──
-    audio.play().catch(e=>{ console.warn('play error:',e); });
+    console.log('[PLAY] Tentative lecture piste', idx, 'src:', audio.src.slice(0,60), 'paused:', audio.paused, 'readyState:', audio.readyState);
+    audio.play().then(()=>{
+      console.log('[PLAY] Lecture démarrée OK, piste', idx);
+    }).catch(e=>{ console.warn('[PLAY] ERREUR:', e.name, e.message); });
 
     // ── Armer le timer au point cible (NEXT si autoNext ON, END sinon) ──
     const arm = ()=>{
@@ -2632,6 +2635,7 @@ D[0].render=function(){ _r0(); pazRender(); pazRenderList(); };
 
 const _s0=D[0]._startTrack.bind(D[0]);
 D[0]._startTrack=function(i){
+  console.log('[PLAY] _startTrack appelé, i:', i, 'tracks:', D[0].tracks.length);
   _pazWvFile=null;
   _pazZoom={on:false,s:0,e:1,key:''};
   _pazLaunchTime=nowClock();
@@ -3142,23 +3146,8 @@ function registerVUGain(){}
 // ── DIFF 1 — source unique → VU sticky ──
 const _t0_orig=D[0].togglePlay.bind(D[0]);
 D[0].togglePlay=function(){
-  const el=D[0].audios[D[0].ci]; if(!el){getCtx().resume();return _t0_orig();}
+  console.log('[PLAY] D[0].togglePlay appelé, tracks:', D[0].tracks.length, 'playing:', D[0].playing);
   getCtx().resume();
-  if(!vu1){
-    const ctx=getCtx();
-    const src=ctx.createMediaElementSource(el);
-    const sp=ctx.createChannelSplitter(2);
-    const aL=ctx.createAnalyser(),aR=ctx.createAnalyser();
-    aL.fftSize=1024;aR.fftSize=1024;aL.smoothingTimeConstant=0.8;aR.smoothingTimeConstant=0.8;
-    const masterGn=ctx.createGain(); masterGn.gain.value=1;
-    src.connect(masterGn); masterGn.connect(sp);
-    sp.connect(aL,0); sp.connect(aR,1);
-    // Sortie hauts-parleurs
-    const mg=ctx.createChannelMerger(2);
-    aL.connect(mg,0,0); aR.connect(mg,0,1); mg.connect(ctx.destination);
-    vu1={aL,aR,gn:masterGn};
-    buildBars('vu1-L');buildBars('vu1-R');
-  }
   _t0_orig();
 };
 
