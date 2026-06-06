@@ -2028,7 +2028,7 @@ class Diffuser{
     this._playToken++;
     if(this._outTimer){ clearTimeout(this._outTimer); this._outTimer=null; }
     this.audios.forEach(a=>{
-      if(a){ a.onended=null; if(!a.paused) a.pause(); a.currentTime=0; }
+      if(a){ a.onended=null; a.pause(); a.currentTime=0; }
     });
     this.playing=false;
     this.ci=0;
