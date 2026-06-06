@@ -3198,41 +3198,8 @@ vuLoop();
 
 setInterval(()=>{D.forEach(d=>d.tick());rdvTick();pazTick();},80);
 
-// ══════════════════════════════════════
-// ONGLETS
-// ══════════════════════════════════════
-function switchTab(name){
-  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  const panel=document.getElementById('tab-'+name);
-  if(panel) panel.classList.add('active');
-  const btn=document.getElementById('tab-btn-'+name);
-  if(btn) btn.classList.add('active');
-});
-}
 
-
-function rdvTick(){}:${fmt2(m)}:${fmt2(sec)}`:`${fmt2(m)}:${fmt2(sec)}`;
-    if(cdEl){
-      cdEl.textContent=txt;
-      cdEl.className=diff<=30?'rdv-countdown urgent':diff<=120?'rdv-countdown warning':'rdv-countdown';
-    }
-    popCdEls.forEach(el=>{ if(el){ el.textContent=txt; el.style.color=diff<=30?'#e03020':diff<=120?'#f5c400':'#00d4f0'; }});
-    popBarEls.forEach(el=>{ if(el){ el.style.width=Math.min(100,(diff/60)*100)+'%'; }});
-  } else {
-    // DÉCLENCHER
-    if(cdEl){cdEl.textContent='▶ EN COURS';cdEl.className='rdv-countdown';cdEl.style.color='#00d96a';}
-    
-    rdvMasterLaunch();
-    s.armed=false;
-    const armBtn=document.getElementById('rdv-master-arm');
-    if(armBtn){armBtn.classList.remove('armed');armBtn.textContent='⏱ ARMER';}
-  }
-}
-
-
-}
-
+function rdvTick(){}
 
 // ══════════════════════════════════════
 // VU STRIPS LATÉRAUX SUR CHAQUE DIFFUSEUR
@@ -3331,16 +3298,6 @@ function audioRegisterPfl(el)  { audioRegister(el, 'pfl'); }
 
 const STRIP_ANALYSERS = {}; // {d0, d1, nat, sat, dab, hz}
 
-    // Sinon créer un analyser branché sur la source déjà créée
-    const src = SRCS[key] || null;
-    if(src){
-      const an = ctx.createAnalyser();
-      an.fftSize = 512; an.smoothingTimeConstant = 0.7;
-      src.connect(an);
-      STRIP_ANALYSERS[key] = an;
-    }
-  }catch(e){ console.warn('wireStrip', key, e); }
-}
 
 // Boucle de mise à jour des strips
 function stripLoop(){
@@ -3892,43 +3849,9 @@ function plInit(){
 plInit();
 
 
-// ── Indicateur ON AIR DIFF SECOURS ──
-let _d2OnairTimeout = null;
-function _d2UpdateOnAir(state){
-  const badge=document.getElementById('d2-onair-badge');
-  const dot=document.getElementById('d2-onair-dot');
-  const title=document.getElementById('d2-onair-title');
-  if(!badge) return;
-  if(state && state.playing){
-    badge.style.borderColor='#8a1010';badge.style.background='rgba(120,8,8,.25)';badge.style.color='#ff5050';badge.style.boxShadow='0 0 12px rgba(220,30,30,.2)';
-    if(dot){dot.style.background='#ff3030';dot.style.animation='blink .8s ease-in-out infinite';}
-    if(title){title.style.color='#ff8080';title.textContent=state.title?'· '+state.title:'';}
-  } else {
-    badge.style.borderColor='#38404e';badge.style.background='transparent';badge.style.color='var(--txt-mute)';badge.style.boxShadow='none';
-    if(dot){dot.style.background='#5a6880';dot.style.animation='none';}
-    if(title){title.style.color='var(--txt-mute)';title.textContent='—';}
-  }
-  clearTimeout(_d2OnairTimeout);
-  if(state&&state.playing) _d2OnairTimeout=setTimeout(()=>_d2UpdateOnAir({playing:false}),5000);
-}
-
-// Écouter le BroadcastChannel (même origine/onglet)
-try{
-  const bc2=new BroadcastChannel('radio_onair');
-  bc2.onmessage=e=>_d2UpdateOnAir(e.data);
-}catch(e){}
-
-// Polling localStorage (cross-onglets)
-setInterval(()=>{
-  try{
-    const raw=localStorage.getItem('radio_onair');
-    if(raw){const state=JSON.parse(raw);if(Date.now()-state.ts<5000)_d2UpdateOnAir(state);else _d2UpdateOnAir({playing:false});}
-  }catch(e){}
-},1000);
-
-// ══════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════
 // NAVIGATION ONGLETS
-// ══════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════
 function switchTab(name){
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
@@ -3936,20 +3859,8 @@ function switchTab(name){
   if(panel) panel.classList.add('active');
   const btn=document.getElementById('tab-btn-'+name);
   if(btn) btn.classList.add('active');
-});
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  const panel = document.getElementById('tab-'+name);
-  if(panel){
-    panel.style.display='flex';
-    panel.classList.add('active');
-  }
-  const btn = document.getElementById('tab-btn-'+name);
-  if(btn) btn.classList.add('active');
   if(name==='diffusion'){ requestAnimationFrame(()=>{ _pazWvFile=null; pazDrawBg(true); }); }
 }
-
-
-// ════════════════════════════════════════════════════════════════
 
 // ════════════════════════════════════════════════════════════════
 // RACCOURCIS CLAVIER
